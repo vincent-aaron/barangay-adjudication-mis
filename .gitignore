@@ -5,17 +5,17 @@
 config.env
 ocr.env
 
-# Dependencies
+# ignore vendor directory and other dependencies
 vendor/
 phpmailer/
 PhpSpreadsheet/
 
-# Uploads (VERY IMPORTANT)
+# ignore all files in the uploads directory
 uploads/
 uploads_id/
 
 # SQL dumps
 sql/*.sql
 
-# Composer PHAR (if exists)
+# Composer phar
 composer.phar

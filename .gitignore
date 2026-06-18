@@ -1,0 +1,21 @@
+# Environment files
+*.env
+*.env.*
+**/*.env
+config.env
+ocr.env
+
+# Dependencies
+vendor/
+phpmailer/
+PhpSpreadsheet/
+
+# Uploads (VERY IMPORTANT)
+uploads/
+uploads_id/
+
+# SQL dumps
+sql/*.sql
+
+# Composer PHAR (if exists)
+composer.phar

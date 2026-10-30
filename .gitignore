@@ -28,3 +28,6 @@ node_modules/
 .DS_Store
 Thumbs.db
 *.log
+
+# Chatbot response log (runtime data, may contain user conversations)
+chatbot/log.txt

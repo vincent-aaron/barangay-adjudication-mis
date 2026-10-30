@@ -19,3 +19,12 @@ sql/*.sql
 
 # Composer phar
 composer.phar
+# Node dependencies (Tailwind is loaded from the CDN, not from here)
+node_modules/
+
+# IDE / OS files and logs
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log

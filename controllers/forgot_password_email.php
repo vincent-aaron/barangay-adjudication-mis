@@ -1,54 +1,24 @@
-<?php
-session_start();
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+require_once __DIR__ . '/../includes/mailer.php';
+
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 require_once __DIR__ . '/../server/server.php';
-
-// Add PHPMailer (same as account_verification)
-require __DIR__ . '/../phpmailer/PHPMailer.php';
-require __DIR__ . '/../phpmailer/SMTP.php';
-require __DIR__ . '/../phpmailer/Exception.php';
-
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+require_once __DIR__ . '/../includes/rate_limit.php';
 
 // Replace send_email with this debug-aware version
 function send_email($toEmail, $toName, $subject, $bodyHtml){
-    $mail = new PHPMailer(true);
-    $smtpDebug = '';
+    $mail = bpamis_mailer();
     try {
-        // collect debug output into $smtpDebug
-        $mail->SMTPDebug = 2;
-        $mail->Debugoutput = function($str, $level) use (&$smtpDebug) {
-            $smtpDebug .= "[".$level."] ".$str . "\n";
-        };
 
-        $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com';
-        $mail->SMTPAuth = true;
-        $mail->Username = 'REDACTED';
-        $mail->Password = 'REDACTED'; // use app password if 2FA
-        $mail->SMTPSecure = 'tls';
-        $mail->Port = 587;
-
-        // local dev TLS loosen (remove in production)
-        $mail->SMTPOptions = [
-            'ssl' => [
-                'verify_peer' => false,
-                'verify_peer_name' => false,
-                'allow_self_signed' => true,
-            ],
-        ];
-
-        $mail->setFrom('demo@example.com', 'Barangay Secretary');
         $mail->addAddress($toEmail, $toName);
         $mail->isHTML(true);
         $mail->Subject = $subject;
         $mail->Body    = $bodyHtml;
 
         $mail->send();
-        return ['success'=>true, 'debug'=>$smtpDebug];
+        return ['success'=>true];
     } catch (Exception $e){
-        $err = $mail->ErrorInfo ?: $e->getMessage();
-        return ['success'=>false, 'error'=>$err, 'debug'=>$smtpDebug];
+        return ['success'=>false];
     }
 }
 
@@ -64,6 +34,22 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     echo json_encode(['success'=>false,'message'=>'Invalid email']);
     exit;
 }
+
+// Demo mode: nothing is emailed. The page shows the demo code instead.
+if (bpamis_demo_mode()) {
+    echo json_encode(['success'=>true,'message'=>'Demo mode: no email was sent. Use the code shown on this page.','email_sent'=>false]);
+    exit;
+}
+
+// Limit reset requests from one address: 10 per hour.
+if (bpamis_rate_exceeded($conn, 'forgot', bpamis_client_ip(), 10, 3600)) {
+    echo json_encode(['success'=>false,'message'=>'Too many requests. Try again later.']);
+    exit;
+}
+bpamis_rate_hit($conn, 'forgot', bpamis_client_ip(), 3600);
+
+// The response is the same whether or not an account exists.
+$genericReply = ['success'=>true,'message'=>'If this email exists, an OTP has been sent.'];
 
 // Look for user across resident_info, barangay_officials, external_complainant
 $user = null;
@@ -128,13 +114,12 @@ if (!$user) {
 }
 
 if (!$user) {
-    // explicit message per request
-    echo json_encode(['success'=>false,'message'=>"No account found with this email."]);
+    echo json_encode($genericReply);
     exit;
 }
 
 if (!$isAllowed) {
-    echo json_encode(['success'=>false,'message'=>$notAllowedMessage]);
+    echo json_encode($genericReply);
     exit;
 }
 
@@ -177,10 +162,8 @@ $body = "<p>Dear {$toName},</p>
 $mailRes = send_email($email, $toName, $subject, $body);
 
 // Return result
-echo json_encode([
-    'success'    => true,
-    'message'    => 'If this email exists, an OTP has been sent.',
-    'email_sent' => (bool)($mailRes['success'] ?? false),
-    'mail_error' => $mailRes['error'] ?? null
-]);
+if (empty($mailRes['success'])) {
+    error_log('forgot_password_email: delivery failed');
+}
+echo json_encode($genericReply);
 exit;

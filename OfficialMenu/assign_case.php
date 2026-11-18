@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 include '../controllers/session_control.php';
 include '../server/server.php';
 
@@ -45,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Prepare notification insert statement ONCE before the loop
                 $notifStmt = $conn->prepare("INSERT INTO notifications (title, message, type, created_at, lupon_id, is_read) VALUES (?, ?, ?, NOW(), ?, 0)");
                 if (!$notifStmt) {
-                    die("Notification statement prepare failed: " . $conn->error);
+                    die("Notification statement prepare failed: ");
                 }
 
                 // Loop to find each Lupon and insert notification
@@ -95,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <title>Assign a Case</title>
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js" defer></script>

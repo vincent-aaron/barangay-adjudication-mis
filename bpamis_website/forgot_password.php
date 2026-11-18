@@ -1,5 +1,6 @@
-<?php
-session_start();
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -15,7 +16,7 @@ session_start();
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="styles/premium-animations.css">
     <link rel="stylesheet" href="styles/premium-patterns.css">
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
 
     <style>
         body {
@@ -400,6 +401,11 @@ session_start();
 </head>
 
 <body class="bg-gray-50 font-sans">
+<?php if (bpamis_demo_mode()): ?>
+<div role="note" style="margin:12px auto;max-width:560px;padding:10px 14px;border-radius:10px;background:#fff7ed;border:1px solid #fed7aa;color:#7c2d12;font:14px/1.45 system-ui,-apple-system,'Segoe UI',sans-serif">
+    <strong>Demo mode:</strong> no email is sent. Enter any demo email, then use code <code style="font-weight:700"><?= htmlspecialchars((string)bpamis_config('demo.otp', '123456'), ENT_QUOTES, 'UTF-8') ?></code>. Demo passwords are not actually changed.
+</div>
+<?php endif; ?>
     <div class="register-bg flex flex-col min-h-screen flex-1 flex items-center justify-center p-4">
         <div class="login-container premium-glass premium-stats-container">
             <!-- Animated gradient background -->
@@ -641,8 +647,6 @@ document.getElementById('fp-send').addEventListener('click', async () => {
     btn.disabled = false;
     btn.textContent = 'Send OTP';
     
-    console.log('forgot_password_email response:', res);
-    if (res.mail_error) console.error('PHPMailer error (forgot_password_email):', res.mail_error);
     
     if (res.success) {
         document.getElementById('step1').classList.add('hidden');
@@ -689,8 +693,6 @@ document.getElementById('fp-reset').addEventListener('click', async () => {
     btn.disabled = false;
     btn.textContent = 'Reset Password';
     
-    console.log('verify_forgot_otp response:', res);
-    if (res.mail_error) console.error('PHPMailer error (verify_forgot_otp):', res.mail_error);
     
     if (res.success) {
         document.getElementById('step2').classList.add('hidden');
@@ -718,8 +720,6 @@ document.getElementById('fp-send-mobile').addEventListener('click', async () => 
     btn.disabled = false;
     btn.textContent = 'Send OTP';
     
-    console.log('forgot_password_email response:', res);
-    if (res.mail_error) console.error('PHPMailer error (forgot_password_email):', res.mail_error);
     
     if (res.success) {
         document.getElementById('step1-mobile').classList.add('hidden');
@@ -766,8 +766,6 @@ document.getElementById('fp-reset-mobile').addEventListener('click', async () =>
     btn.disabled = false;
     btn.textContent = 'Reset Password';
     
-    console.log('verify_forgot_otp response:', res);
-    if (res.mail_error) console.error('PHPMailer error (verify_forgot_otp):', res.mail_error);
     
     if (res.success) {
         document.getElementById('step2-mobile').classList.add('hidden');

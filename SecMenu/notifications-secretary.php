@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 include '../controllers/session_control.php';
 include '../server/server.php';
 
@@ -171,9 +172,9 @@ checkDeadlines3Days($conn, 'case_info', 'Case_ID', 'Deadline Overdue', 'Deadline
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notifications</title>
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
     <!-- Proper Font Awesome CSS (icons were not showing because only JS was loaded) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Optional JS (kept if any dynamic FA functionality is needed) -->
@@ -1017,7 +1018,7 @@ checkDeadlines3Days($conn, 'case_info', 'Case_ID', 'Deadline Overdue', 'Deadline
                     $accLast = htmlspecialchars($account['Last_Name']);
                     $accEmail = htmlspecialchars($account['email']);
                     $accAddress = htmlspecialchars($account['Address'] ?? '');
-                    $accValidId = htmlspecialchars($account['valid_id_path'] ?? '');
+                    $accValidId = !empty($account['valid_id_path']) ? 'controllers/view_valid_id.php?id=' . (int)$account['Resident_ID'] : '';
                 ?>
                 <div class="s-notif-card relative group bg-white/85 backdrop-blur rounded-xl border border-indigo-100 p-5 flex flex-col gap-3 hover:-translate-y-[2px] hover:shadow-md transition-all" data-type="unverified" data-base="unverified" data-date="1970-01-01 00:00:00" data-unread="0" data-search="<?= $search ?>">
                     <span class="absolute top-3 right-3 inline-flex w-2.5 h-2.5 rounded-full bg-orange-500 shadow"></span>

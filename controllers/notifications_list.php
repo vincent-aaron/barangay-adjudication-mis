@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 // Returns latest notifications for secretary view (JSON list)
 // Shape: { notifications: [ { notification_id, type, title, message, created_at, is_read, isPriority } ] }
 header('Content-Type: application/json');

@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 /**
  * Appoint Hearing Page
  * Barangay Panducot Adjudication Management Information System
@@ -17,8 +18,8 @@ if (isset($_SESSION['success_message'])) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $selectedCase = (int) ($_POST['case_id'] ?? 0);
     $hearingTitle = $_POST['hearing_title'] ?? '';
-    $hearingDate = $_POST['hearing_date'] ?? '';
-    $hearingTime = $_POST['hearing_time'] ?? '';
+    $hearingDate = preg_replace('/[^0-9\-]/', '', (string)($_POST['hearing_date'] ?? ''));
+    $hearingTime = preg_replace('/[^0-9:APMapm ]/', '', (string)($_POST['hearing_time'] ?? ''));
     $venue = $_POST['venue'] ?? '';
     $participants = $_POST['participants'];
     $remarks = trim($_POST['hearing_remarks'] ?? '');
@@ -78,7 +79,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     $stmt->close();
-    $conn->close();
 }
 ?>
 <!DOCTYPE html>
@@ -88,7 +88,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Appoint Hearing</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
     <script>
         tailwind.config = { theme:{ extend:{ colors:{ primary:{50:'#f0f7ff',100:'#e0effe',200:'#bae2fd',300:'#7cccfd',400:'#36b3f9',500:'#0c9ced',600:'#0281d4',700:'#026aad',800:'#065a8f',900:'#0a4b76'}}, boxShadow:{glow:'0 0 0 1px rgba(12,156,237,.10),0 4px 18px -2px rgba(6,90,143,.18)'} } } };
     </script>

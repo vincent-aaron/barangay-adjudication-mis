@@ -1,6 +1,6 @@
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
 
-<?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 ?>
 <!DOCTYPE html>
 <html lang="en">

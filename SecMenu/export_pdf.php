@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 // Robust autoload detection (local vendor then parent)
 $autoloadLocal = __DIR__ . '/vendor/autoload.php';
 $autoloadRoot  = dirname(__DIR__) . '/vendor/autoload.php';

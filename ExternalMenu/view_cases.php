@@ -1,14 +1,15 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 include '../controllers/session_control.php';
 
 // Ensure a session is active so $_SESSION can be inspected regardless of role-based session name
 if (session_status() === PHP_SESSION_NONE) {
-    @session_start();
+    if (session_status() === PHP_SESSION_NONE) { session_start(); }
 }
 
 // If user_id isn't present, redirect to the centralized login page (use absolute path to avoid relative errors)
 if (empty($_SESSION['user_id'])) {
-    header("Location: /BPAMIS/bpamis_website/login.php");
+    header('Location: ' . bpamis_url('bpamis_website/login.php'));
     exit();
 }
 $role = strtolower($_SESSION['role'] ?? '');
@@ -17,15 +18,15 @@ $role = strtolower($_SESSION['role'] ?? '');
 // redirect to that role's home. This mirrors resident behavior where pages are scoped by role.
 if ($role !== 'external') {
     if ($role === 'resident') {
-        header('Location: /BPAMIS/ResidentMenu/home-resident.php');
+        header('Location: ' . BPAMIS_BASE . '/ResidentMenu/home-resident.php');
         exit();
     } elseif ($role === 'official') {
         // Fallback for officials — send to secretary home (most officials also have position-specific homes)
-        header('Location: /BPAMIS/SecMenu/home-secretary.php');
+        header('Location: ' . BPAMIS_BASE . '/SecMenu/home-secretary.php');
         exit();
     } else {
         // Not logged in as a recognized role — send to centralized login
-        header('Location: /BPAMIS/bpamis_website/login.php');
+        header('Location: ' . BPAMIS_BASE . '/bpamis_website/login.php');
         exit();
     }
 }
@@ -110,7 +111,7 @@ foreach($statusCounts as $k => $v){
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Cases</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <script>
         tailwind.config = {

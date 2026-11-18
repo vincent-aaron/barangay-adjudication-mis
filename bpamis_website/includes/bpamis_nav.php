@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../../includes/bootstrap.php';
+
 // Ultra-modern navigation bar for BPAMIS landing/dashboard
 ?>
 <!-- Navigation Bar -->

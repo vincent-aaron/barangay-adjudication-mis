@@ -1,9 +1,10 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 // --- CAPTCHA VERIFICATION FUNCTION ---
 include '../controllers/session_control.php';
 function verify_captcha($captcha_response)
 {
-    $secret = "REDACTED"; 
+    $secret = (string)bpamis_config('recaptcha.secret_key', '');
     $url = "https://www.google.com/recaptcha/api/siteverify";
     $data = [
         'secret' => $secret,
@@ -84,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reg_email'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BPAMIS Register</title>
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -1451,7 +1452,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reg_email'])) {
 
                         <h4 class="text-lg font-medium text-blue-700 mt-6">8. Contact Information</h4>
                         <p>To ask questions or comment about this privacy policy and our privacy practices, contact us
-                            at: info@bpamis.gov.ph</p>
+                            at: support@example.com</p>
                     </div>
                 </section>
 
@@ -1573,7 +1574,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reg_email'])) {
                         <p>We welcome your feedback on the accessibility of BPAMIS. Please let us know if you encounter
                             accessibility barriers:</p>
                         <ul class="list-disc pl-5 space-y-1 mt-2">
-                            <li>Email: accessibility@bpamis.gov.ph</li>
+                            <li>Email: support@example.com</li>
                             <li>Phone: +63 (xxx) xxx-xxxx</li>
                         </ul>
                         <p>We try to respond to feedback within 3 business days.</p>

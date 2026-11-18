@@ -1,9 +1,9 @@
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
 
-<?php
 // --- CAPTCHA VERIFICATION FUNCTION ---
 function verify_captcha($captcha_response)
 {
-    $secret = "REDACTED";
+    $secret = (string)bpamis_config('recaptcha.secret_key', '');
     $url = "https://www.google.com/recaptcha/api/siteverify";
     $data = [
         'secret' => $secret,
@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reg_email'])) {
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="styles/premium-animations.css">
     <link rel="stylesheet" href="styles/premium-patterns.css">
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
 
     <style>
         body {
@@ -1140,6 +1140,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reg_email'])) {
 </head>
 
 <body class="bg-gray-50 font-sans">
+<?php if (bpamis_demo_mode()): ?>
+<div role="note" style="margin:12px auto;max-width:640px;padding:10px 14px;border-radius:10px;background:#fff7ed;border:1px solid #fed7aa;color:#7c2d12;font:14px/1.45 system-ui,-apple-system,'Segoe UI',sans-serif">
+    <strong>Demo mode:</strong> registration is turned off so no real IDs are collected. Please use a <a href="login.php" style="color:#7c2d12;text-decoration:underline">demo login</a>.
+</div>
+<?php endif; ?>
     <!--  include_once('includes/bpamis_nav.php'); -->
     <div class="register-bg flex flex-col min-h-screen flex-1 flex items-center justify-center py-8 px-4">
         <div class="register-container premium-glass premium-stats-container">
@@ -1710,7 +1715,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reg_email'])) {
                             <h4 class="text-lg font-medium text-blue-700 mt-6">8. Contact Information</h4>
                             <p>To ask questions or comment about this privacy policy and our privacy practices, contact
                                 us
-                                at: info@bpamis.gov.ph</p>
+                                at: support@example.com</p>
                         </div>
                     </section>
 
@@ -1856,7 +1861,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reg_email'])) {
                                 encounter
                                 accessibility barriers:</p>
                             <ul class="list-disc pl-5 space-y-1 mt-2">
-                                <li>Email: accessibility@bpamis.gov.ph</li>
+                                <li>Email: support@example.com</li>
                                 <li>Phone: +63 (xxx) xxx-xxxx</li>
                             </ul>
                             <p>We try to respond to feedback within 3 business days.</p>

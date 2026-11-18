@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 // Secretary Update Case Status - Premium UI (clean file)
 require_once __DIR__ . '/../controllers/session_control.php';
 require_once __DIR__ . '/../server/server.php';
@@ -98,7 +99,7 @@ if ($stmt) {
 
 if (empty($rows)) {
     echo "<p class='text-center text-red-600'>Case not found or query error.</p>";
-    echo "<p class='text-center text-xs text-gray-500'>" . htmlspecialchars($conn->error) . "</p>";
+    echo "<p class='text-center text-xs text-gray-500'>" . "</p>";
     exit;
 }
 $case = $rows[0];
@@ -121,7 +122,7 @@ $complaintId = isset($case['Complaint_ID']) ? intval($case['Complaint_ID']) : 0;
 
 // Removed: Secretary does not assign Lupon Tagapamayapa
 
-// Resolve case type display from COMPLAINT_INFO.case_type if present, else fallback to CASE_INFO.Case_Type
+// Resolve case type display from complaint_info.case_type if present, else fallback to CASE_INFO.Case_Type
 $caseType = '';
 if (isset($case['case_type'])) {
     $caseType = trim((string)($case['case_type'] ?? ''));
@@ -197,7 +198,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $target = $absDir . time() . '_' . $safeName;
         $relativePath = $relDir . basename($target);
 
-        if (!move_uploaded_file($file['tmp_name'], $target)) {
+        if (!bpamis_safe_move($file['tmp_name'], $target)) {
             header('Location: update_case_status.php?id=' . $caseId . '&attach=0&error=move');
             exit;
         }
@@ -207,7 +208,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $conn->query("ALTER TABLE {$TB_CASE_INFO} ADD COLUMN Certificate_Path VARCHAR(512) NULL");
         }
 
-        // Update CASE_INFO with the relative path
+        // Update case_info with the relative path
         if ($upd = $conn->prepare("UPDATE {$TB_CASE_INFO} SET Certificate_Path = ? WHERE Case_ID = ?")) {
             $upd->bind_param('si', $relativePath, $caseId);
             $upd->execute();
@@ -439,7 +440,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $caseTypeUpdated = true;
             } else {
                 $res = $conn->query("UPDATE {$TB_COMPLAINT_INFO} SET case_type='" . $conn->real_escape_string($postedType) . "' WHERE Complaint_ID=" . $complaintId);
-                if (!$res) { error_log('fallback update COMPLAINT_INFO failed: '.$conn->error); }
+                if (!$res) { error_log('fallback update complaint_info failed: '.$conn->error); }
                 $caseTypeUpdated = true;
             }
         }
@@ -455,11 +456,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Update case status
     if ($upd = $conn->prepare("UPDATE {$TB_CASE_INFO} SET Case_Status=? WHERE Case_ID=?")) {
         $upd->bind_param('si', $newStatus, $caseId);
-        if (!$upd->execute()) { error_log('Update CASE_INFO error: '.$upd->error); }
+        if (!$upd->execute()) { error_log('Update case_info error: '.$upd->error); }
         $upd->close();
     } else {
         $res = $conn->query("UPDATE {$TB_CASE_INFO} SET Case_Status='" . $conn->real_escape_string($newStatus) . "' WHERE Case_ID=$caseId");
-        if (!$res) { error_log('fallback update CASE_INFO failed: '.$conn->error); }
+        if (!$res) { error_log('fallback update case_info failed: '.$conn->error); }
     }
 
 
@@ -666,7 +667,7 @@ $statusClass = $statusStyles[$statusUpper] ?? 'bg-primary-50 text-primary-600 bo
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
     <title>Case • Update Status</title>
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config = { theme: { extend: { colors: { primary: { 50: '#f0f7ff', 100: '#e0effe', 200: '#bae2fd', 300: '#7cccfd', 400: '#36b3f9', 500: '#0c9ced', 600: '#0281d4', 700: '#026aad', 800: '#065a8f', 900: '#0a4b76' } }, boxShadow: { glow: '0 0 0 1px rgba(12,156,237,.08),0 4px 20px -2px rgba(6,90,143,.18)' }, animation: { 'fade-in': 'fadeIn .4s ease-out' }, keyframes: { fadeIn: { '0%': { opacity: 0 }, '100%': { opacity: 1 } } } } } };</script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
@@ -970,7 +971,7 @@ $statusClass = $statusStyles[$statusUpper] ?? 'bg-primary-50 text-primary-600 bo
         })();
     </script>
 
-    <?php $conn->close(); ?>
+    <?php  ?>
 </body>
 
 </html>

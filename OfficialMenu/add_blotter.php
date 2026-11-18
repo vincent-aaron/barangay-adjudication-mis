@@ -1,5 +1,6 @@
-<?php
-session_start();
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 include_once __DIR__ . '/../server/server.php';
 
 $success = false;
@@ -24,9 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <title>Add Blotter Report</title>
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
 </head>
 <body class="bg-gray-100 min-h-screen py-10 px-4">
     <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow">

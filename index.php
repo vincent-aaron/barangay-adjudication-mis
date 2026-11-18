@@ -1,4 +1,3 @@
 <?php
-header("Location: /bpamis_website/bpamis.php");
-exit();
-?>
+header('Location: bpamis_website/bpamis.php');
+exit;

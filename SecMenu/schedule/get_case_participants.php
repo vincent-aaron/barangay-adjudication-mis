@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../../includes/bootstrap.php';
+
 include 'db-connect.php';
 
 if (!isset($_GET['Case_ID'])) {

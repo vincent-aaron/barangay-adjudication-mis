@@ -1,5 +1,5 @@
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
 
-<?php
 include '../server/server.php';
 
 if (isset($_POST['Signup'])) {
@@ -96,7 +96,7 @@ if (isset($_POST['Signup'])) {
 
             $uploadDir = __DIR__ . '/../uploads_id/';
             if (!is_dir($uploadDir)) {
-                @mkdir($uploadDir, 0777, true);
+                @mkdir($uploadDir, 0755, true);
             }
 
             $origName = basename($file['name']);
@@ -109,7 +109,7 @@ if (isset($_POST['Signup'])) {
             $targetName = $uniq . '_' . $safeName;
             $targetPath = $uploadDir . $targetName;
 
-            if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+            if (bpamis_safe_move($file['tmp_name'], $targetPath)) {
                 $valid_id_path = 'uploads_id/' . $targetName;
             } else {
                 echo '<script>alert("Failed to save Valid ID file. Please try again."); window.location.href="../bpamis_website/register.php";</script>';
@@ -154,11 +154,10 @@ if (isset($_POST['Signup'])) {
         if ($valid_id_path && file_exists(__DIR__ . '/../' . $valid_id_path)) {
             @unlink(__DIR__ . '/../' . $valid_id_path);
         }
-        echo '<script>alert("Registration failed: ' . htmlspecialchars($stmt->error) . '"); window.location.href="../bpamis_website/register.php";</script>';
+        echo '<script>alert("Registration failed: ' . '"); window.location.href="../bpamis_website/register.php";</script>';
     }
 
     $stmt->close();
-    $conn->close();
 } else {
     echo '<script>alert("SIGNUP Failed"); window.location.href="../bpamis_website/register.php";</script>';
 }

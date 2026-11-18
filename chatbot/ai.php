@@ -1,42 +1,13 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 header("Content-Type: application/json");
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
 
-// Lightweight .env loader (no external dependency)
-$envPath = __DIR__ . DIRECTORY_SEPARATOR . 'config.env';
-if (file_exists($envPath) && is_readable($envPath)) {
-    $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        $line = trim($line);
-        if ($line === '' || str_starts_with($line, '#')) continue;
-        $parts = explode('=', $line, 2);
-        if (count($parts) === 2) {
-            $k = trim($parts[0]);
-            $v = trim($parts[1]);
-            // Remove optional surrounding quotes
-            if ((str_starts_with($v, '"') && str_ends_with($v, '"')) || (str_starts_with($v, "'") && str_ends_with($v, "'"))) {
-                $v = substr($v, 1, -1);
-            }
-            if ($k !== '') { putenv("$k=$v"); $_ENV[$k] = $v; }
-        }
-    }
-}
+$config = [];
+$apiKey = trim((string)bpamis_config('chatbot.openrouter_api_key', ''));
 
-$config = []; // keep empty so code won’t break
-
-// Prefer environment variable
-$apiKey =trim($_ENV['OPENROUTER_API_KEY'] ?? getenv('OPENROUTER_API_KEY') ?? '');
-$apiKey = is_string($apiKey) ? trim($apiKey) : '';
-
-// Allow test shim to inject request body during local testing
-if (function_exists('chatbot_get_input')) {
-    $rawInput = chatbot_get_input();
-} else {
-    $rawInput = file_get_contents("php://input");
-}
+$rawInput = file_get_contents('php://input');
 $input = json_decode($rawInput, true);
-$userMessageRaw = trim((string)($input["message"] ?? ""));
+$userMessageRaw = mb_substr(trim((string)($input["message"] ?? "")), 0, 1000);
 $userMessage = strtolower($userMessageRaw);
 
 // Normalize common typos/variants (Tagalog shorthand, code-switching)
@@ -68,11 +39,6 @@ if (!$userMessage) {
     exit;
 }
 
-// Quick guard for missing API key to avoid confusing upstream 401s
-if (!$apiKey || !preg_match('/^sk-or-v\d+-/i', $apiKey)) {
-    echo json_encode(["reply" => "Chatbot setup error: Missing or invalid OpenRouter API key. Please set OPENROUTER_API_KEY on the server or update chatbot/config.php."]);
-    exit;
-}
 
 // --- Language and Scope Helpers ---
 // Tagalog detection (lightweight heuristic)
@@ -408,7 +374,6 @@ try {
     }
 } catch (Throwable $e) {
     // Fail silent; log optionally
-    // file_put_contents(__DIR__.'/log.txt', "KB ERROR: ".$e->getMessage()."\n", FILE_APPEND);
 }
 
 // 🤖 AI Chatbot (if no rule matched)
@@ -445,13 +410,35 @@ if ($kbContext) {
     $systemBase .= "\n\nUse the following verified barangay knowledge base context if relevant. When context includes both ENGLISH and TAGALOG sections, select the appropriate language (Tagalog if detected). Cite only facts present there when possible.\n".$kbContext;
 }
 
+// Without an API key the assistant answers from the built-in barangay guide only.
+if ($apiKey === '' || !function_exists('curl_init')) {
+    $offline = "The AI assistant is offline on this site, so here is what the barangay guide says.";
+    $guide = trim((string)preg_replace('/\s+/', ' ', strip_tags((string)$kbContext)));
+    if ($guide !== '') {
+        $offline .= "\n\n" . mb_substr($guide, 0, 700) . (mb_strlen($guide) > 700 ? '...' : '');
+    } else {
+        $offline = "The AI assistant is offline on this site. Please visit the barangay hall or use the Help Center for guidance on filing a complaint.";
+    }
+    echo json_encode(["reply" => nl2br(htmlspecialchars($offline))]);
+    exit;
+}
+
+// Limit use of the paid API: 30 questions per hour from one address.
+require_once __DIR__ . '/../server/server.php';
+require_once __DIR__ . '/../includes/rate_limit.php';
+if (bpamis_rate_exceeded($conn, 'chatbot', bpamis_client_ip(), 30, 3600)) {
+    echo json_encode(["reply" => "You have reached the question limit for now. Please try again later."]);
+    exit;
+}
+bpamis_rate_hit($conn, 'chatbot', bpamis_client_ip(), 3600);
+
 $messages = [
     [ 'role' => 'system', 'content' => $systemBase ],
     [ 'role' => 'user', 'content' => $userMessage ]
 ];
 
 $data = [
-    "model" => "meta-llama/llama-3-8b-instruct", // Replace with other model if needed
+    "model" => (string)bpamis_config('chatbot.model', 'openai/gpt-4o-mini'), // Replace with other model if needed
     "messages" => $messages,
     "temperature" => 0.5,
     "max_tokens" => 500
@@ -460,8 +447,8 @@ $data = [
 // Build a Referer from current host to satisfy OpenRouter identification for web apps
 $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-$referer = getenv('OPENROUTER_APP_REFERER') ?: ($scheme . '://' . $host . '/');
-$appTitle = getenv('OPENROUTER_APP_TITLE') ?: 'BPAMIS Case Assistant';
+$referer = $scheme . '://' . $host . '/';
+$appTitle = (string)bpamis_config('chatbot.app_title', 'BPAMIS');
 
 $headers = [
     "Content-Type: application/json",
@@ -491,10 +478,9 @@ $performRequest = function() use ($data, $headers) {
 
 [$response, $info, $err] = $performRequest();
 $status = $info['http_code'] ?? 0;
-file_put_contents(__DIR__ . DIRECTORY_SEPARATOR . "log.txt", sprintf("[%s] HTTP %s — %s\n", date('c'), (string)$status, is_string($response) ? trim($response) : '[no body]'), FILE_APPEND);
 
 if ($err) {
-    echo json_encode(["reply" => "Curl Error: $err"]);
+    echo json_encode(["reply" => "The assistant is unavailable right now. Please try again later."]);
     exit;
 }
 
@@ -506,23 +492,22 @@ if (($status === 401 || ($responseData['error']['code'] ?? null) === 401) && str
     usleep(250 * 1000);
     [$response, $info, $err] = $performRequest();
     $status = $info['http_code'] ?? 0;
-    file_put_contents(__DIR__ . DIRECTORY_SEPARATOR . "log.txt", sprintf("[%s] RETRY HTTP %s — %s\n", date('c'), (string)$status, is_string($response) ? trim($response) : '[no body]'), FILE_APPEND);
     if ($err) {
-        echo json_encode(["reply" => "Curl Error (after retry): $err"]);
+        echo json_encode(["reply" => "The assistant is unavailable right now. Please try again later."]);
         exit;
     }
     $responseData = json_decode($response, true);
 }
 
 if (!is_array($responseData)) {
-    echo json_encode(["reply" => "OpenRouter Error: Unexpected response from API (HTTP $status). Please try again later."]);
+    echo json_encode(["reply" => "The assistant is unavailable right now. Please try again later."]);
     exit;
 }
 
 if (isset($responseData['error'])) {
     $msg = $responseData['error']['message'] ?? 'Unknown error';
     $code = $responseData['error']['code'] ?? $status;
-    echo json_encode(["reply" => "OpenRouter Error ($code): $msg"]);
+    echo json_encode(["reply" => "The assistant is unavailable right now. Please try again later."]);
     exit;
 }
 

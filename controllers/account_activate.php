@@ -1,11 +1,7 @@
-<?php
-session_start();
-require '../phpmailer/PHPMailer.php';
-require '../phpmailer/SMTP.php';
-require '../phpmailer/Exception.php';
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+require_once __DIR__ . '/../includes/mailer.php';
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
 include '../server/server.php';
 
@@ -13,7 +9,7 @@ function verify_email_dns_simple_local($email){
     if(!filter_var($email,FILTER_VALIDATE_EMAIL)) return false;
     [$u,$d] = explode('@',$email,2);
     $hasMx = function_exists('getmxrr') ? @getmxrr($d,$mxhosts) && count($mxhosts) > 0 : false;
-    $hasA = checkdnsrr($d,'A') || checkdnsrr($d,'AAAA');
+    $hasA = bpamis_domain_resolves($d);
     return ($hasMx || $hasA);
 }
 
@@ -64,11 +60,10 @@ if (isset($_POST['submitActivation']) || !empty($_POST['activation_email'])) {
     $subject = 'Your Barangay Account Has Been Activated';
     $body = "<html><body style='font-family:Arial,sans-serif;color:#333;'><p>Dear <strong>".htmlspecialchars($toName)."</strong>,</p><p>Your account has been <strong>activated</strong>. You may now access the BPAMIS system using your registered email.</p><p>Regards,<br><strong>Barangay Secretary</strong></p><hr><p style='font-size:12px;color:#777;'>This is an automated message from BPAMIS. Do not reply.</p></body></html>";
 
-    $mail = new PHPMailer(true);
+    $mail = bpamis_mailer();
     try{
-        $mail->isSMTP(); $mail->Host='smtp.gmail.com'; $mail->SMTPAuth=true;
-        $mail->Username='REDACTED'; $mail->Password='REDACTED'; $mail->SMTPSecure='tls'; $mail->Port=587;
-        $mail->setFrom('demo@example.com','Barangay Secretary'); $mail->addAddress($email,$toName);
+
+$mail->addAddress($email,$toName);
         $mail->isHTML(true); $mail->Subject=$subject; $mail->Body=$body; $mail->send();
 
         if($userType==='resident'){ $upd=$conn->prepare("UPDATE resident_info SET isActive = 1 WHERE resident_id = ?"); $upd->bind_param('i',$user['id']); $upd->execute(); }

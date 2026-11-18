@@ -11,8 +11,12 @@ phpmailer/
 PhpSpreadsheet/
 
 # ignore all files in the uploads directory
-uploads/
-uploads_id/
+uploads/*
+!uploads/.htaccess
+uploads_id/*
+!uploads_id/.htaccess
+SecMenu/uploads/*
+!SecMenu/uploads/.htaccess
 
 # SQL dumps
 sql/*.sql
@@ -31,3 +35,14 @@ Thumbs.db
 
 # Chatbot response log (runtime data, may contain user conversations)
 chatbot/log.txt
+
+# Local configuration with real credentials (see config/config.example.php)
+config/config.local.php
+
+# Runtime logs
+storage/logs/*
+!storage/logs/.gitkeep
+
+# Never commit database dumps other than the fictional demo seed
+*.sql
+!database/demo_seed.sql

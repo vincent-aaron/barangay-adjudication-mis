@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 include '../controllers/session_control.php';
 include_once __DIR__ . '/../server/server.php';
 // Accept case id from either ?id= or ?case_id=
@@ -660,7 +661,7 @@ if ($caseDetails && !empty($caseDetails['Complaint_ID'])) {
   <meta charset="UTF-8">
   <title>Case Hearing Logs</title>
    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+  <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = { theme: { extend: { colors: { primary: { 50: '#f0f7ff', 100: '#e0effe', 200: '#bae2fd', 300: '#7cccfd', 400: '#36b3f9', 500: '#0c9ced', 600: '#0281d4', 700: '#026aad', 800: '#065a8f', 900: '#0a4b76' } }, boxShadow: { glow: '0 0 0 1px rgba(12,156,237,0.10), 0 4px 18px -2px rgba(6,90,143,0.20)' }, keyframes: { fadeIn: { '0%': { opacity: 0, transform: 'translateY(4px)' }, '100%': { opacity: 1, transform: 'translateY(0)' } }, pulseSoft: { '0%,100%': { opacity: 1 }, '50%': { opacity: .55 } } }, animation: { 'fade-in': 'fadeIn .5s ease-out', 'pulse-soft': 'pulseSoft 3s ease-in-out infinite' } } } };

@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 require_once(__DIR__ . '/../server/server.php');
 
 // For API endpoints included via fetch/XHR, suppress session_control's inline scripts
@@ -56,12 +57,12 @@ if ($check) {
 
 $ins = $conn->prepare("INSERT INTO lupon_declines (case_id, lupon_id, reason, created_at) VALUES (?, ?, ?, NOW())");
 if (!$ins) {
-    echo json_encode(['success' => false, 'error' => 'DB prepare failed: ' . $conn->error]);
+    echo json_encode(['success' => false, 'error' => 'DB prepare failed: ']);
     exit;
 }
 $ins->bind_param('iis', $case_id, $official_id, $reason);
 if (!$ins->execute()) {
-    echo json_encode(['success' => false, 'error' => 'DB execute failed: ' . $ins->error]);
+    echo json_encode(['success' => false, 'error' => 'DB execute failed: ']);
     exit;
 }
 $ins->close();

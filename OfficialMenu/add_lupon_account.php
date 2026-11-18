@@ -1,8 +1,9 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 // --- CAPTCHA VERIFICATION FUNCTION ---
 function verify_captcha($captcha_response)
 {
-    $secret = "REDACTED"; // Google's test secret key
+    $secret = (string)bpamis_config('recaptcha.secret_key', '');
     $url = "https://www.google.com/recaptcha/api/siteverify";
     $data = [
         'secret' => $secret,
@@ -83,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reg_email'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BPAMIS Register</title>
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -408,7 +409,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reg_email'])) {
                     <p class="mb-6 text-gray-600">Already have an account? <a href="login.php"
                             class="text-blue-600 font-medium toggle-form">Log In</a></p>
 
-                    <form id="registerForm" method="POST" action="../controllers/create_lupondb.php" class="space-y-4">
+                    <form id="registerForm" method="POST" action="../controllers/create_officialdb.php" class="space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="input-group">
                                 <i class="fas fa-user"></i>

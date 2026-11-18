@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 include '../controllers/session_control.php';
 include_once __DIR__ . '/../server/server.php';
 
@@ -34,10 +35,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_kasunduan'])) 
             $size = (int)$fileArr['size'];
             if (in_array($ext, $allowed, true) && $size <= 20*1024*1024) {
                 $baseUpload = __DIR__ . '/../uploads/blotter/' . $posted_id . '/';
-                if (!is_dir($baseUpload)) { @mkdir($baseUpload, 0777, true); }
+                if (!is_dir($baseUpload)) { @mkdir($baseUpload, 0755, true); }
                 $fname = 'kasunduan_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
                 $dest = $baseUpload . $fname;
-                if (move_uploaded_file($fileArr['tmp_name'], $dest)) {
+                if (bpamis_safe_move($fileArr['tmp_name'], $dest)) {
                     // Ensure column exists
                     $colChk = $conn->query("SHOW COLUMNS FROM blotter_info LIKE 'Kasunduan_Path'");
                     if (!$colChk || $colChk->num_rows === 0) {
@@ -161,7 +162,7 @@ VB_END:;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blotter Details</title>
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

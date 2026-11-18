@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 include '../controllers/session_control.php';
 include '../server/server.php';
 
@@ -62,8 +63,8 @@ if (!empty($notification['related_id'])) {
 if ($typeNormalized === 'complaint' && $related_id > 0) {
     $complaint_id = $related_id;
     $query = "SELECT c.*, r.First_Name, r.Last_Name
-              FROM COMPLAINT_INFO c
-              LEFT JOIN RESIDENT_INFO r ON c.Resident_ID = r.Resident_ID
+              FROM complaint_info c
+              LEFT JOIN resident_info r ON c.Resident_ID = r.Resident_ID
               WHERE c.Complaint_ID = " . intval($complaint_id) . " LIMIT 1";
     $result_complaint = $conn->query($query);
     if ($result_complaint && $result_complaint->num_rows > 0) {
@@ -121,7 +122,7 @@ if ($caseIdForLink <= 0 && !empty($notification['message'])) {
     }
 
     if ($complaintIdCandidate > 0) {
-        $res = $conn->query("SELECT Case_ID FROM CASE_INFO WHERE Complaint_ID = " . intval($complaintIdCandidate) . " LIMIT 1");
+        $res = $conn->query("SELECT Case_ID FROM case_info WHERE Complaint_ID = " . intval($complaintIdCandidate) . " LIMIT 1");
         if ($res && $res->num_rows > 0) {
             $row = $res->fetch_assoc();
             $caseIdForLink = intval($row['Case_ID']);
@@ -131,7 +132,7 @@ if ($caseIdForLink <= 0 && !empty($notification['message'])) {
 
 // 5) if notification itself is a complaint and complaint has been linked to a case, use that
 if ($caseIdForLink <= 0 && $typeNormalized === 'complaint' && $related_id > 0) {
-    $res = $conn->query("SELECT Case_ID FROM CASE_INFO WHERE Complaint_ID = " . intval($related_id) . " LIMIT 1");
+    $res = $conn->query("SELECT Case_ID FROM case_info WHERE Complaint_ID = " . intval($related_id) . " LIMIT 1");
     if ($res && $res->num_rows > 0) {
         $row = $res->fetch_assoc();
         $caseIdForLink = intval($row['Case_ID']);
@@ -149,7 +150,7 @@ if ($caseIdForLink > 0) {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Notification • Details</title>
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {

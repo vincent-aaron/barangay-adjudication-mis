@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 require_once __DIR__ . '/../controllers/session_control.php';
 require_once __DIR__ . '/../server/server.php';
 require_once __DIR__ . '/../includes/db_compat.php';
@@ -273,7 +274,7 @@ if (!function_exists('truncate_preserve_words')) {
 <head>
     <meta charset="UTF-8">
     <title>Case Details</title>
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>

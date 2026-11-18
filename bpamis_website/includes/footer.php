@@ -1,4 +1,4 @@
-
+<?php require_once __DIR__ . '/../../includes/bootstrap.php'; ?>
 <style>
     /* Custom styles for the Legal Modal */
     .legal-custom-scrollbar {
@@ -466,7 +466,7 @@
                         <i class="fas fa-phone-alt text-blue-600 mr-2 md:mr-3 text-xs"></i> +63 (xxx) xxx-xxxx
                     </li>
                     <li class="text-xs md:text-sm text-gray-600 flex items-center">
-                        <i class="fas fa-envelope text-blue-600 mr-2 md:mr-3 text-xs"></i> demo@example.com
+                        <i class="fas fa-envelope text-blue-600 mr-2 md:mr-3 text-xs"></i> support@example.com
 
                     </li>
                 </ul>
@@ -756,7 +756,7 @@
                                     <i class="fas fa-envelope text-blue-600 mt-1 mr-3"></i>
                                     <div>
                                         <p class="text-gray-700 font-medium">Email Support</p>
-                                        <p class="text-gray-600">support@bpamis.gov.ph</p>
+                                        <p class="text-gray-600">support@example.com</p>
                                         <p class="text-sm text-gray-500">We aim to respond within 24 hours</p>
                                     </div>
                                 </div>
@@ -1205,7 +1205,7 @@
 
                         <h4 class="text-lg font-medium text-blue-700 mt-6">8. Contact Information</h4>
                         <p>To ask questions or comment about this privacy policy and our privacy practices, contact us
-                            at: info@bpamis.gov.ph</p>
+                            at: support@example.com</p>
                     </div>
                 </section>
 
@@ -1327,7 +1327,7 @@
                         <p>We welcome your feedback on the accessibility of BPAMIS. Please let us know if you encounter
                             accessibility barriers:</p>
                         <ul class="list-disc pl-5 space-y-1 mt-2">
-                            <li>Email: accessibility@bpamis.gov.ph</li>
+                            <li>Email: support@example.com</li>
                             <li>Phone: +63 (xxx) xxx-xxxx</li>
                         </ul>
                         <p>We try to respond to feedback within 3 business days.</p>
@@ -1400,7 +1400,7 @@
                         </div>
                         <div>
                             <h4 class="font-semibold">Email</h4>
-                            <p class="text-blue-100">info@bpamis.gov.ph</p>
+                            <p class="text-blue-100">support@example.com</p>
                         </div>
                     </div>
                 </div>

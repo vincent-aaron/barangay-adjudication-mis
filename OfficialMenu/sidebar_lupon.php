@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../includes/bootstrap.php'; ?>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
         tailwind.config = {
@@ -44,7 +45,7 @@
         <div class="flex justify-between items-center mb-6">
             <div class="flex items-center">
                 <a href="home-lupon.php">
-                    <img src="../Assets/img/logo.png" alt="BPAMIS Logo" width="50" height="50" class="mr-3">
+                    <img src="../Assets/Img/logo.png" alt="BPAMIS Logo" width="50" height="50" class="mr-3">
                 </a>
                 <h2 class="text-lg font-bold text-primary-700">BPAMIS</h2>
             </div>

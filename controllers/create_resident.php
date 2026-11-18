@@ -1,6 +1,6 @@
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
 
-<?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 include '../server/server.php';
 
 if (isset($_POST['Signup'])) {
@@ -71,11 +71,10 @@ if (isset($_POST['Signup'])) {
         echo '<script>alert("Resident created successfully."); window.location.href="../SecMenu/add_resident.php";</script>';
         exit();
     } else {
-        echo '<script>alert("Registration failed: ' . htmlspecialchars($stmt->error) . '"); window.location.href="../SecMenu/add_resident.php";</script>';
+        echo '<script>alert("Registration failed: ' . '"); window.location.href="../SecMenu/add_resident.php";</script>';
     }
 
     $stmt->close();
-    $conn->close();
 } else {
     echo '<script>alert("Invalid access."); window.location.href="../SecMenu/add_resident.php";</script>';
 }

@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 header('Content-Type: application/json; charset=utf-8');
 // Simple endpoint: ?case_id=<id> -> returns { success: true, original_id: '...' }
 include __DIR__ . '/../server/server.php';

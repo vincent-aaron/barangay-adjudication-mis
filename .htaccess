@@ -1,0 +1,49 @@
+# BPAMIS rules for shared hosting. Works from the domain root or a subfolder.
+
+Options -Indexes
+DirectoryIndex index.php index.html
+ServerSignature Off
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Dot files, except the standard .well-known folder
+    RewriteRule (^|/)\.(?!well-known/) - [F,L]
+
+    # Application internals are never served directly
+    RewriteRule ^(config|storage|database|sql|server|tools|phpmailer|PhpSpreadsheet|node_modules)(/|$) - [F,L]
+    RewriteRule (^|/)vendor(/|$) - [F,L]
+    RewriteRule ^chatbot/knowledge(/|$) - [F,L]
+    RewriteRule ^includes/(?!sw\.php$) - [F,L]
+
+    # Uploaded files can never run as code
+    RewriteRule ^(uploads|uploads_id)/.*\.(php[0-9]?|phtml|phar|pht|shtml|cgi|pl|py)$ - [F,L,NC]
+</IfModule>
+
+# Configuration, dumps, logs, keys and tooling
+<FilesMatch "(?i)\.(sql|env|log|bak|old|orig|swp|phar|lock|ini|sh|bat|md|dist|example|local\.php)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+<FilesMatch "^(composer|composer\.json|package\.json|package-lock\.json|log\.txt)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header unset X-Powered-By
+</IfModule>

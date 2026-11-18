@@ -1,34 +1,7 @@
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
 
-<?php
 // controllers/ocr_handler.php
-// OCR.Space wrapper (no local monthly counter). Reads key from c:\xampp\htdocs\BPAMIS_01\ocr.env
-// ocr.env example:
-// OCR_SPACE_API_KEY=your_real_key_here
-
-function read_env($key, $default = null) {
-    // Try OS env first, then controllers/ocr.env, then project-root/ocr.env
-    $fromEnv = getenv($key);
-    if ($fromEnv !== false && $fromEnv !== '') return $fromEnv;
-
-    $paths = [
-        __DIR__ . '/ocr.env',     // supports: c:\xampp\htdocs\BPAMIS_01\controllers\ocr.env
-        __DIR__ . '/../ocr.env',  // supports: c:\xampp\htdocs\BPAMIS_01\ocr.env
-    ];
-    foreach ($paths as $envPath) {
-        if (!file_exists($envPath)) continue;
-        $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        foreach ($lines as $line) {
-            $line = trim($line);
-            if ($line === '' || $line[0] === '#') continue;
-            $pos = strpos($line, '=');
-            if ($pos === false) continue;
-            $k = trim(substr($line, 0, $pos));
-            $v = trim(substr($line, $pos + 1));
-            if ($k === $key) return $v;
-        }
-    }
-    return $default;
-}
+// OCR.Space wrapper. The API key is read from config/config.local.php.
 
 /*
   Adjustable knobs:
@@ -63,9 +36,9 @@ function map_ocr_error($httpCode, $exitCode, $errMsg) {
 }
 
 function ocr_space_file($file_path, $language = 'eng') {
-    $api_key = read_env('OCR_SPACE_API_KEY');
+    $api_key = (string)bpamis_config('ocr.api_key', '');
     if (!$api_key) {
-        return ['success' => false, 'code'=>'missing_key', 'reason'=>'OCR API key missing. Add OCR_SPACE_API_KEY to ocr.env', 'message'=>'OCR API key missing. Add OCR_SPACE_API_KEY to ocr.env'];
+        return ['success' => false, 'code'=>'missing_key', 'reason'=>'OCR API key missing. Set ocr.api_key in config/config.local.php.', 'message'=>'OCR API key missing. Set ocr.api_key in config/config.local.php.'];
     }
 
     if (!is_file($file_path)) {

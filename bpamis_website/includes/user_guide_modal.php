@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../../includes/bootstrap.php';
+
 // Help Center Modal Include File
 // This file contains the Help Center modal that can be included in any page
 if (!defined('USER_GUIDE_MODAL_INCLUDED')) {

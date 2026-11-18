@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 include '../controllers/session_control.php';
 // DB Connection
 include_once __DIR__ . '/../server/server.php';
@@ -15,7 +16,7 @@ function cc($k,$arr){ return $arr[$k] ?? 0; }
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title><?= htmlspecialchars($pageTitle) ?></title>
-        <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+        <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
         <script>

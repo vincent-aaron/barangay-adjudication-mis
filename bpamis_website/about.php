@@ -1,5 +1,6 @@
-<?php
-session_start();
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -16,7 +17,7 @@ session_start();
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-  <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+  <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
   <style>
     body {
       color: black;

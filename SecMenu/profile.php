@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 include '../controllers/session_control.php';
 include '../server/server.php';
 
@@ -159,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_get_case_types']
         $result = $conn->query($sql);
         if ($result === false) {
             error_log('ajax_get_case_types DB error: ' . $conn->error . " -- SQL: " . $sql);
-            echo json_encode(['success' => false, 'message' => 'Database error: ' . $conn->error]);
+            echo json_encode(['success' => false, 'message' => 'Database error']);
             exit;
         }
 
@@ -183,7 +184,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_get_case_types']
         ]);
     } catch (Exception $e) {
         error_log('ajax_get_case_types error: ' . $e->getMessage());
-        echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
+        echo json_encode(['success' => false, 'message' => 'Database error']);
     }
     exit;
 }
@@ -227,16 +228,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_add_case_type'])
                 if ($conn->errno === 1062) { // Duplicate entry
                     echo json_encode(['success' => false, 'message' => 'This case type already exists.']);
                 } else {
-                    echo json_encode(['success' => false, 'message' => 'Failed to add case type: ' . $conn->error]);
+                    echo json_encode(['success' => false, 'message' => 'Failed to add case type: ']);
                 }
             }
             $stmt->close();
         } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to prepare statement: ' . $conn->error]);
+            echo json_encode(['success' => false, 'message' => 'Failed to prepare statement: ']);
         }
     } catch (Exception $e) {
         error_log('ajax_add_case_type error: ' . $e->getMessage());
-        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        echo json_encode(['success' => false, 'message' => 'Request failed']);
     }
     exit;
 }
@@ -269,7 +270,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_edit_case_type']
 
     $stmt = $conn->prepare("UPDATE case_types SET `" . $ct_col . "` = ? WHERE Type_ID = ?");
         if (!$stmt) {
-            echo json_encode(['success' => false, 'message' => 'Failed to prepare statement: ' . $conn->error]);
+            echo json_encode(['success' => false, 'message' => 'Failed to prepare statement: ']);
             exit;
         }
         $stmt->bind_param('si', $newName, $typeId);
@@ -283,13 +284,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_edit_case_type']
             if ($conn->errno === 1062) { // Duplicate entry
                 echo json_encode(['success' => false, 'message' => 'This case type name already exists.']);
             } else {
-                echo json_encode(['success' => false, 'message' => 'Failed to update: ' . $stmt->error]);
+                echo json_encode(['success' => false, 'message' => 'Failed to update: ']);
             }
         }
         $stmt->close();
     } catch (Exception $e) {
         error_log('ajax_edit_case_type error: ' . $e->getMessage());
-        echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
+        echo json_encode(['success' => false, 'message' => 'Database error']);
     }
     exit;
 }
@@ -307,7 +308,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_delete_case_type
         
         $stmt = $conn->prepare("DELETE FROM case_types WHERE Type_ID = ?");
         if (!$stmt) {
-            echo json_encode(['success' => false, 'message' => 'Failed to prepare statement: ' . $conn->error]);
+            echo json_encode(['success' => false, 'message' => 'Failed to prepare statement: ']);
             exit;
         }
         $stmt->bind_param('i', $typeId);
@@ -318,12 +319,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_delete_case_type
                 echo json_encode(['success' => false, 'message' => 'Case type not found.']);
             }
         } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to delete: ' . $stmt->error]);
+            echo json_encode(['success' => false, 'message' => 'Failed to delete: ']);
         }
         $stmt->close();
     } catch (Exception $e) {
         error_log('ajax_delete_case_type error: ' . $e->getMessage());
-        echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
+        echo json_encode(['success' => false, 'message' => 'Database error']);
     }
     exit;
 }
@@ -743,7 +744,7 @@ TEXT;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
     <title>Profile - BPAMIS</title>
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -1674,7 +1675,7 @@ TEXT;
                             </div>
                             <div class="p-6">
                                 <p class="text-sm text-gray-600 mb-4">Add, edit, or delete case types available for validation during complaint processing.</p>
-                                <p class="text-sm mb-4"><a href="../show_case_types.php" target="_blank" class="text-indigo-600 hover:text-indigo-800 underline hidden">Open debug view (shows Case_Type / case_type column)</a></p>
+                                
                                 
                                 <!-- Add New Case Type Form -->
                                 <div class="mb-6 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-200">
@@ -2025,7 +2026,7 @@ TEXT;
                     listContainer.innerHTML = '<div class="text-center py-4 text-gray-500"><i class="fas fa-spinner fa-spin mr-2"></i>Attempting fallback to load case types...</div>';
 
                     // Attempt the HTML fallback so users still see rows if debug page is available
-                    return fetch('../show_case_types.php').then(r => r.text()).then(html => {
+                    return Promise.reject(new Error('Case types unavailable')).then(r => r.text()).then(html => {
                         try {
                             const parser = new DOMParser();
                             const doc = parser.parseFromString(html, 'text/html');
@@ -2094,10 +2095,10 @@ TEXT;
                 const msg = (data && data.message) ? data.message : '';
                 let debug = '';
                 if (data && data.detected_column) debug += '<div class="text-xs text-gray-500 mt-2">Detected column: ' + escapeHtml(data.detected_column) + '</div>';
-                if (data && data.sql) debug += '<div class="text-xs text-gray-500 mt-1">SQL: ' + escapeHtml(data.sql) + '</div>';
+                
 
                 // Attempt HTML fallback
-                fetch('../show_case_types.php')
+                Promise.reject(new Error('Case types unavailable'))
                     .then(r => r.text())
                     .then(html => {
                         try {

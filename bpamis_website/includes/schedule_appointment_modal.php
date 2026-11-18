@@ -1,7 +1,8 @@
-<?php
+<?php require_once __DIR__ . '/../../includes/bootstrap.php';
+
 // Help Center Modal Include File
 // This file contains the Help Center modal that can be included in any page
-if (!defined(' SCHEDULE_APPOINTMENT_MODAL_INCLUDED')) {
+if (!defined('SCHEDULE_APPOINTMENT_MODAL_INCLUDED')) {
     define('SCHEDULE_APPOINTMENT_MODAL_INCLUDED', true);
 }
 ?>

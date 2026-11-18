@@ -1,10 +1,11 @@
-<?php
+<?php require_once __DIR__ . '/bootstrap.php';
+
 require_once __DIR__ . '/../server/server.php';
 require_once __DIR__ . '/db_compat.php';
 
 // Ensure session is started (in case parent didn't start it)
 if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+    if (session_status() === PHP_SESSION_NONE) { session_start(); }
 }
 
 $notif_count = 0; // default

@@ -1,5 +1,5 @@
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
 
-<?php
 // Clean and modernized print page for KP Forms with multi-select printing
 include '../controllers/session_control.php';
 include '../server/server.php'; // Keep include for consistency; not used directly here
@@ -73,7 +73,7 @@ $kpForms = [
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Print KP Forms - Barangay Panducot</title>
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>

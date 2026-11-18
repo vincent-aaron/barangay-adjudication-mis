@@ -1,25 +1,14 @@
-<?php
-session_start();
-require '../phpmailer/PHPMailer.php';
-require '../phpmailer/SMTP.php';
-require '../phpmailer/Exception.php';
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+require_once __DIR__ . '/../includes/mailer.php';
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
 include '../server/server.php';
 
 function send_email($toEmail, $toName, $subject, $bodyHtml){
-    $mail = new PHPMailer(true);
+    $mail = bpamis_mailer();
     try {
-        $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com';
-        $mail->SMTPAuth = true;
-         $mail->Username = 'REDACTED';
-        $mail->Password = 'REDACTED'; // use app password if 2FA
-        $mail->SMTPSecure = 'tls';
-        $mail->Port = 587;
-        $mail->setFrom('demo@example.com', 'Barangay Secretary');
+
         $mail->addAddress($toEmail, $toName);
         $mail->isHTML(true);
         $mail->Subject = $subject;
@@ -42,7 +31,7 @@ function verify_email_dns(string $email){
     }
     [$user, $domain] = explode('@', $email, 2);
     $hasMx = function_exists('getmxrr') ? @getmxrr($domain, $mxhosts, $mxweight) && count($mxhosts) > 0 : false;
-    $hasA  = checkdnsrr($domain, 'A') || checkdnsrr($domain, 'AAAA');
+    $hasA  = bpamis_domain_resolves($domain);
     if ($hasMx || $hasA) return ['ok'=>true, 'reason'=>'dns_ok'];
     return ['ok'=>false, 'reason'=>'no_mx_or_a'];
 }

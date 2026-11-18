@@ -1,11 +1,7 @@
-<?php
-session_start();
-require '../phpmailer/PHPMailer.php';
-require '../phpmailer/SMTP.php';
-require '../phpmailer/Exception.php';
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+require_once __DIR__ . '/../includes/mailer.php';
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
 include '../server/server.php';
 
@@ -13,7 +9,7 @@ function verify_email_dns_simple_local($email){
     if(!filter_var($email,FILTER_VALIDATE_EMAIL)) return false;
     [$u,$d] = explode('@',$email,2);
     $hasMx = function_exists('getmxrr') ? @getmxrr($d,$mxhosts) && count($mxhosts) > 0 : false;
-    $hasA = checkdnsrr($d,'A') || checkdnsrr($d,'AAAA');
+    $hasA = bpamis_domain_resolves($d);
     return ($hasMx || $hasA);
 }
 
@@ -55,11 +51,10 @@ if (isset($_POST['deactivate'])) {
     }
 
     // send deactivation email
-    $mail = new PHPMailer(true);
+    $mail = bpamis_mailer();
     try {
-        $mail->isSMTP(); $mail->Host='smtp.gmail.com'; $mail->SMTPAuth=true;
-        $mail->Username='REDACTED'; $mail->Password='REDACTED'; $mail->SMTPSecure='tls'; $mail->Port=587;
-        $mail->setFrom('demo@example.com','Barangay Secretary'); $mail->addAddress($toEmail, $toName);
+
+$mail->addAddress($toEmail, $toName);
         $mail->isHTML(true);
         $mail->Subject = 'Your Account Has Been Deactivated';
         $mail->Body = "<p>Dear <strong>".htmlspecialchars($toName)."</strong>,</p><p>Your account has been deactivated for the following reason:</p><p><em>".htmlspecialchars($reason)."</em></p><p>If you believe this is an error, please contact the barangay office.</p><br><p>Regards,<br>Barangay Admin</p>";
@@ -73,7 +68,7 @@ if (isset($_POST['deactivate'])) {
         if ($ajax) { echo json_encode(['success'=>true,'message'=>'Deactivation email sent and account disabled']); exit; }
         $_SESSION['message'] = 'Deactivation email sent and account disabled.'; header('Location: ../SecMenu/home-secretary.php'); exit;
     } catch (Exception $e) {
-        if ($ajax) { echo json_encode(['success'=>false,'message'=>'Failed to send email','error'=>$e->getMessage()]); exit; }
+        if ($ajax) { echo json_encode(['success'=>false,'message'=>'Failed to send email']); exit; }
         $_SESSION['message'] = 'Failed to send deactivation email. Account not changed.'; header('Location: ../SecMenu/home-secretary.php'); exit;
     }
 }

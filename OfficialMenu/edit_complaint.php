@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 include_once __DIR__ . '/../server/server.php';
 
 $complaint_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
@@ -35,7 +36,7 @@ $complaint = $result->fetch_assoc();
 <html>
 <head>
     <title>Edit Complaint</title>
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
     <link href="https://cdn.tailwindcss.com" rel="stylesheet">
 </head>
 <body class="bg-blue-50 p-10">
@@ -80,7 +81,7 @@ $complaint = $result->fetch_assoc();
             </div>
 
             <div class="flex justify-between mt-6">
-                <a href="view_complaint.php?id=<?= $complaint_id ?>" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancel</a>
+                <a href="view_complaints.php?id=<?= $complaint_id ?>" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancel</a>
                 <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save Changes</button>
             </div>
         </form>
@@ -90,4 +91,4 @@ $complaint = $result->fetch_assoc();
     </div>
 </body>
 </html>
-<?php $conn->close(); ?>
+<?php  ?>

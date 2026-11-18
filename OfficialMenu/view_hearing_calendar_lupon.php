@@ -1,4 +1,5 @@
-<?php include '../controllers/session_control.php';?>
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+include '../controllers/session_control.php';?>
 <?php include 'sidebar_lupon.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -6,7 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Hearing Calendar</title>
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
     <!-- FullCalendar -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 

@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../../includes/bootstrap.php';
+
 // CalendarResident: Resident hearings calendar embedded via iframe.
 // Normalize session adoption & user id retrieval (supports legacy Resident_ID).// adopts role-specific session name if cookie present
 require_once __DIR__ . '/db-connect.php';
@@ -18,7 +19,7 @@ if (empty($_SESSION['user_id'])) {
 
 $Resident_ID = (int) $_SESSION['user_id'];
 
-$val = $conn->query("SELECT * FROM bpamis_demo.resident_info WHERE Resident_ID = $Resident_ID");
+$val = $conn->query("SELECT * FROM resident_info WHERE Resident_ID = $Resident_ID");
 if ($val->num_rows == 0) {
   error_log('[CalendarResident] Resident_ID '. $Resident_ID .' not found; forcing logout');
   echo "<script>alert('Resident not found.'); window.location.href='../../bpamis_website/login.php';</script>";
@@ -42,11 +43,11 @@ $conn->query($sync_sql);
 // Select visible hearings for this resident, excluding hearings that already have meeting logs
 $hearing_stmt = $conn->prepare("
   SELECT DISTINCT sl.hearingID, sl.hearingTitle, sl.hearingDateTime, sl.remarks, ci.Case_ID
-  FROM bpamis_demo.schedule_list sl
-  JOIN bpamis_demo.case_info ci ON sl.Case_ID = ci.Case_ID
-  JOIN bpamis_demo.complaint_info co ON ci.Complaint_ID = co.Complaint_ID
-  LEFT JOIN bpamis_demo.complaint_respondents cr ON co.Complaint_ID = cr.Complaint_ID
-  LEFT JOIN bpamis_demo.meeting_logs ml ON ml.Case_ID = sl.case_id
+  FROM schedule_list sl
+  JOIN case_info ci ON sl.Case_ID = ci.Case_ID
+  JOIN complaint_info co ON ci.Complaint_ID = co.Complaint_ID
+  LEFT JOIN complaint_respondents cr ON co.Complaint_ID = cr.Complaint_ID
+  LEFT JOIN meeting_logs ml ON ml.Case_ID = sl.case_id
     AND DATE(ml.Hearing_Date) = DATE(sl.hearingDateTime)
     AND TIME(ml.Hearing_Time) = TIME(sl.hearingDateTime)
   WHERE (
@@ -92,8 +93,8 @@ $hearing_stmt->close();
 $cases = [];
 $case_stmt = $conn->prepare("
     SELECT ci.Case_ID, ci.Case_Status, ci.Date_Opened, co.Complaint_Title
-    FROM bpamis_demo.case_info ci
-    JOIN bpamis_demo.complaint_info co ON ci.Complaint_ID = co.Complaint_ID
+    FROM case_info ci
+    JOIN complaint_info co ON ci.Complaint_ID = co.Complaint_ID
     WHERE co.Resident_ID = ?
     ORDER BY ci.Date_Opened DESC
 ");
@@ -121,7 +122,6 @@ while ($c = $case_res->fetch_assoc()) {
 }
 $case_stmt->close();
 
-$conn->close();
 
 $events_json = json_encode($events);
 $cases_json = json_encode($cases);

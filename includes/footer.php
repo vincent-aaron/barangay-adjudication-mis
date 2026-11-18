@@ -1,4 +1,4 @@
-
+<?php require_once __DIR__ . '/bootstrap.php'; ?>
 <style>
     /* Custom styles for the Legal Modal */
     .legal-custom-scrollbar {
@@ -356,7 +356,7 @@
                 <div class="flex items-start space-x-3 md:space-x-4 mb-4 md:mb-6">
                     <div
                         class="flex items-center justify-center w-12 h-12 md:w-16 md:h-16 rounded-xl border-4 border-white bg-gradient-to-br from-blue-100 via-white to-blue-50 shadow-xl">
-                        <a href="#"><img src="../assets/img/logo.png" alt="BPAMIS Logo" class="w-8 h-8 md:w-10 md:h-10 object-contain"></a>
+                        <a href="#"><img src="../Assets/Img/logo.png" alt="BPAMIS Logo" class="w-8 h-8 md:w-10 md:h-10 object-contain"></a>
                     </div>
                     <div>
                         <h3
@@ -456,7 +456,7 @@
                                 </ol>
                                 <p class="mt-2">Your account will need to be verified before you can use all
                                     features.</p>
-                                <a href="../register.php"
+                                <a href="../bpamis_website/register.php"
                                     class="mt-2 inline-block text-sm text-blue-600 hover:text-blue-800 font-medium">Register
                                     Now <i class="fas fa-arrow-right ml-1"></i></a>
                             </div>
@@ -479,7 +479,7 @@
                                 </ol>
                                 <p class="mt-2">If you forgot your password, use the "Forgot Password" link on the
                                     login page.</p>
-                                <a href="../login.php"
+                                <a href="../bpamis_website/login.php"
                                     class="mt-2 inline-block text-sm text-blue-600 hover:text-blue-800 font-medium">Log
                                     In <i class="fas fa-arrow-right ml-1"></i></a>
                             </div>
@@ -659,7 +659,7 @@
                                     <i class="fas fa-envelope text-blue-600 mt-1 mr-3"></i>
                                     <div>
                                         <p class="text-gray-700 font-medium">Email Support</p>
-                                        <p class="text-gray-600">support@bpamis.gov.ph</p>
+                                        <p class="text-gray-600">support@example.com</p>
                                         <p class="text-sm text-gray-500">We aim to respond within 24 hours</p>
                                     </div>
                                 </div>
@@ -1108,7 +1108,7 @@
 
                         <h4 class="text-lg font-medium text-blue-700 mt-6">8. Contact Information</h4>
                         <p>To ask questions or comment about this privacy policy and our privacy practices, contact us
-                            at: info@bpamis.gov.ph</p>
+                            at: support@example.com</p>
                     </div>
                 </section>
 
@@ -1230,7 +1230,7 @@
                         <p>We welcome your feedback on the accessibility of BPAMIS. Please let us know if you encounter
                             accessibility barriers:</p>
                         <ul class="list-disc pl-5 space-y-1 mt-2">
-                            <li>Email: accessibility@bpamis.gov.ph</li>
+                            <li>Email: support@example.com</li>
                             <li>Phone: +63 (xxx) xxx-xxxx</li>
                         </ul>
                         <p>We try to respond to feedback within 3 business days.</p>
@@ -1303,7 +1303,7 @@
                         </div>
                         <div>
                             <h4 class="font-semibold">Email</h4>
-                            <p class="text-blue-100">info@bpamis.gov.ph</p>
+                            <p class="text-blue-100">support@example.com</p>
                         </div>
                     </div>
                 </div>

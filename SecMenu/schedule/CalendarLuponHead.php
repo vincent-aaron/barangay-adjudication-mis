@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../../includes/bootstrap.php';
+
 require_once('db-connect.php');
 
 ?>
@@ -535,7 +536,7 @@ require_once('db-connect.php');
       $row['lupon_assigned'] = !empty($luponName) ? $luponName : 'Not Yet Assigned';
       $sched_res[$row['hearingID']] = $row;
     }
-    if(isset($conn)) $conn->close();
+    if(isset($conn)) 
     ?>
   
   <script>
@@ -741,8 +742,8 @@ require_once('db-connect.php');
               if (!ev) return;
               document.getElementById('modalTitle').textContent = ev.title || 'Schedule Details';
               const content = document.getElementById('modalContent');
-              const caseLink = `/BPAMIS/LuponHeadMenu/view_case_details.php?id=${ev.Case_ID}`;
-              const feedbackLink = `/BPAMIS/LuponHeadMenu/feedback_luponhead.php?case_id=${ev.Case_ID}`;
+              const caseLink = `<?= BPAMIS_BASE ?>/LuponHeadMenu/view_case_details.php?id=${ev.Case_ID}`;
+              const feedbackLink = `<?= BPAMIS_BASE ?>/LuponHeadMenu/feedback_luponhead.php?case_id=${ev.Case_ID}`;
               const caseLinkLocal = `${caseLink}`;
               const feedbackLinkLocal = `${feedbackLink}`;
               const contentHTML = `
@@ -790,8 +791,8 @@ require_once('db-connect.php');
           if (!ev) return;
           document.getElementById('modalTitle').textContent = ev.title || 'Schedule Details';
           const content = document.getElementById('modalContent');
-          const caseLink = `/BPAMIS/LuponHeadMenu/view_case_details.php?id=${ev.Case_ID}`;
-          const feedbackLink = `/BPAMIS/LuponHeadMenu/feedback_luponhead.php?case_id=${ev.Case_ID}`;
+          const caseLink = `<?= BPAMIS_BASE ?>/LuponHeadMenu/view_case_details.php?id=${ev.Case_ID}`;
+          const feedbackLink = `<?= BPAMIS_BASE ?>/LuponHeadMenu/feedback_luponhead.php?case_id=${ev.Case_ID}`;
           const caseLinkLocal = `${caseLink}`;
           const feedbackLinkLocal = `${feedbackLink}`;
           const contentHTML = `

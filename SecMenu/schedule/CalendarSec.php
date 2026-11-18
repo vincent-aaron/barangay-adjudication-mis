@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../../includes/bootstrap.php';
+
 require_once('db-connect.php');
 
 ?>
@@ -492,7 +493,7 @@ require_once('db-connect.php');
         $row['description'] = $row['remarks'];
         $sched_res[$row['hearingID']] = $row;
     }
-    if(isset($conn)) $conn->close();
+    if(isset($conn)) 
   ?>
   
   <script>
@@ -708,7 +709,7 @@ require_once('db-connect.php');
               // Build modal content HTML
               const caseLink = `view_case_details.php?id=${ev.Case_ID}`;
               // Meeting log link for this scheduled hearing (assumes meeting_cases_log.php accepts case_id & hearing_id)
-              const meetingLogLink = `/BPAMIS/SecMenu/meeting_cases_log.php?case_id=${ev.Case_ID}&hearing_id=${ev.hearingID}`;
+              const meetingLogLink = `<?= BPAMIS_BASE ?>/SecMenu/meeting_cases_log.php?case_id=${ev.Case_ID}&hearing_id=${ev.hearingID}`;
               const contentHTML = `
                 <p class="mb-2"><strong class="text-gray-700">Hearing Title:</strong> <span class="text-indigo-600">${escapeHtml(ev.title || '')}</span></p>
                 <p class="mb-2"><strong class="text-gray-700">Start:</strong> <span class="text-gray-800">${escapeHtml(ev.sdate || '')}</span></p>
@@ -770,7 +771,7 @@ require_once('db-connect.php');
           // Build modal content HTML
           const caseLink = `view_case_details.php?id=${ev.Case_ID}`;
           // Meeting log link for this scheduled hearing (assumes meeting_cases_log.php accepts case_id & hearing_id)
-          const meetingLogLink = `/BPAMIS/SecMenu/meeting_cases_log.php?case_id=${ev.Case_ID}&hearing_id=${ev.hearingID}`;
+          const meetingLogLink = `<?= BPAMIS_BASE ?>/SecMenu/meeting_cases_log.php?case_id=${ev.Case_ID}&hearing_id=${ev.hearingID}`;
           const contentHTML = `
             <p class="mb-2"><strong class="text-gray-700">Hearing Title:</strong> <span class="text-indigo-600">${escapeHtml(ev.title || '')}</span></p>
             <p class="mb-2"><strong class="text-gray-700">Start:</strong> <span class="text-gray-800">${escapeHtml(ev.sdate || '')}</span></p>

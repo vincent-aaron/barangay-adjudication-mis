@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 include '../controllers/session_control.php';
 include '../server/server.php';
 
@@ -8,8 +9,9 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 $notificationId = (int)$_GET['id'];
 
 // Fetch notification
-$stmt = $conn->prepare("SELECT * FROM notifications WHERE notification_id = ?");
-$stmt->bind_param('i',$notificationId);
+$externalUserId = (int)($_SESSION['user_id'] ?? 0);
+$stmt = $conn->prepare("SELECT * FROM notifications WHERE notification_id = ? AND external_complaint_id = ?");
+$stmt->bind_param('ii', $notificationId, $externalUserId);
 $stmt->execute();
 $result = bpamis_stmt_get_result($stmt);
 if($result->num_rows===0){ die('Notification not found.'); }
@@ -47,7 +49,7 @@ if (($notification['type'] ?? '') === 'Complaint' && !empty($notification['refer
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Notification • Details</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
     <script>
         tailwind.config = {
             theme: {

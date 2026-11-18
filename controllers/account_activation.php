@@ -1,11 +1,7 @@
-<?php
-session_start();
-require '../phpmailer/PHPMailer.php';
-require '../phpmailer/SMTP.php';
-require '../phpmailer/Exception.php';
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+require_once __DIR__ . '/../includes/mailer.php';
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
 include '../server/server.php'; 
 
@@ -47,19 +43,12 @@ if (isset($_POST['submitActivation'])) {
         $update->execute();
 
         // 4. Send email to the user
-        $mail = new PHPMailer(true);
+        $mail = bpamis_mailer();
         try {
             // SMTP settings
-            $mail->isSMTP();
-            $mail->Host = 'smtp.gmail.com';
-            $mail->SMTPAuth = true;
-            $mail->Username = 'REDACTED';        
-            $mail->Password = 'REDACTED'; // App Password
-            $mail->SMTPSecure = 'tls';
-            $mail->Port = 587;
 
             // Email content
-            $mail->setFrom('demo@example.com', 'Barangay Secretary');
+
             $mail->addAddress($resident['email'], $resident['first_name']." ".$resident['last_name']);
 
             $mail->isHTML(true);

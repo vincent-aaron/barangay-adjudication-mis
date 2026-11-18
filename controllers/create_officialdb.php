@@ -1,12 +1,8 @@
-<?php
-session_start();
-include '../server/server.php';
-require '../phpmailer/PHPMailer.php';
-require '../phpmailer/SMTP.php';
-require '../phpmailer/Exception.php';
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+require_once __DIR__ . '/../includes/mailer.php';
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
+include '../server/server.php';
 
 if (isset($_POST['Signup'])) {
     $fname   = $_POST['reg_fname'];
@@ -83,18 +79,11 @@ if (isset($_POST['Signup'])) {
         $update->execute();
 
         // Send Email
-        $mail = new PHPMailer(true);
+        $mail = bpamis_mailer();
         try {
-            $mail->isSMTP();
-            $mail->Host = 'smtp.gmail.com';
-            $mail->SMTPAuth = true;
-            $mail->Username = 'REDACTED';
-            $mail->Password = 'REDACTED';
-            $mail->SMTPSecure = 'tls';
-            $mail->Port = 587;
 
             // Set the sender name per request
-            $mail->setFrom('demo@example.com', 'Barangay Panducot');
+
             $mail->addAddress($email, $name);
 
             $mail->isHTML(true);
@@ -120,7 +109,6 @@ if (isset($_POST['Signup'])) {
     }
 
     $stmt->close();
-    $conn->close();
 
 } else {
     echo '<script>alert("Invalid access."); window.location.href="../SecMenu/add_official_account.php";</script>';

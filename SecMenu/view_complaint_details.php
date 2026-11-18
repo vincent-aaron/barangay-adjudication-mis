@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 // Secretary Complaint Details (Premium UI)
 include '../controllers/session_control.php';
 
@@ -193,7 +194,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         foreach ($respondentList as $r) { $k = mb_strtolower(preg_replace('/\s+/', ' ', $r)); if ($k !== '' && !isset($seen[$k])) { $seen[$k]=true; $unique[] = $r; } }
         $respondentList = $unique;
 
-        // Persist respondents: clear existing then set first as primary Respondent_ID and rest into COMPLAINT_RESPONDENTS
+        // Persist respondents: clear existing then set first as primary Respondent_ID and rest into complaint_respondents
         $conn->query("DELETE FROM complaint_respondents WHERE Complaint_ID=$complaint_id");
         $primaryRid = null;
         if (!empty($respondentList)) {
@@ -205,7 +206,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             if (!empty($resolved)) {
                 $primaryRid = (int)$resolved[0];
-                // Update COMPLAINT_INFO Respondent_ID if column exists
+                // Update complaint_info Respondent_ID if column exists
                 $colChk = $conn->query("SHOW COLUMNS FROM complaint_info LIKE 'Respondent_ID'");
                 if ($colChk && $colChk->num_rows > 0) {
                     $upd = $conn->prepare("UPDATE complaint_info SET Respondent_ID = ? WHERE Complaint_ID = ?");
@@ -282,7 +283,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['upload_attachment']) && !$is_case && !$is_rejected && !$is_dismissed) {
         $saved = [];
         $uploadDir = __DIR__ . '/../uploads/complaints/' . $complaint_id . '/';
-        if (!is_dir($uploadDir)) { @mkdir($uploadDir, 0777, true); }
+        if (!is_dir($uploadDir)) { @mkdir($uploadDir, 0755, true); }
 
         if (!empty($_FILES['attachments_upload']['name']) && is_array($_FILES['attachments_upload']['name'])) {
             foreach ($_FILES['attachments_upload']['name'] as $i => $nm) {
@@ -290,7 +291,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $size = (int)$_FILES['attachments_upload']['size'][$i];
                 if ($size > 20*1024*1024) continue; // skip >20MB
                 $safeName = time().'_'.preg_replace('/[^A-Za-z0-9_.-]/','_', $nm);
-                if (move_uploaded_file($_FILES['attachments_upload']['tmp_name'][$i], $uploadDir.$safeName)) {
+                if (bpamis_safe_move($_FILES['attachments_upload']['tmp_name'][$i], $uploadDir.$safeName)) {
                     $rel = 'uploads/complaints/' . $complaint_id . '/' . $safeName;
                     $saved[] = $rel;
                 }
@@ -396,7 +397,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     try {
                         if (strtolower($case_type) === 'record purposes') {
-                            // For Record Purposes: do NOT insert into CASE_INFO.
+                            // For Record Purposes: do NOT insert into case_info.
                             // Only create a blotter_info row and update complaint status to a blotter state.
 
                             // Build blotter description from complaint details/title
@@ -674,10 +675,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $size = (int)$fileArr['size'];
             if (in_array($ext, $allowed, true) && $size <= 20*1024*1024) {
                 $baseUpload = __DIR__ . '/../uploads/complaints/' . $complaint_id . '/';
-                if (!is_dir($baseUpload)) { @mkdir($baseUpload, 0777, true); }
+                if (!is_dir($baseUpload)) { @mkdir($baseUpload, 0755, true); }
                 $fname = 'salaysay_' . time() . '_' . bin2hex(random_bytes(3)) . '.' . $ext;
                 $dest  = $baseUpload . $fname;
-                if (move_uploaded_file($fileArr['tmp_name'], $dest)) {
+                if (bpamis_safe_move($fileArr['tmp_name'], $dest)) {
                     // Remove previous file if any
                     if (!empty($complaint['Salaysay_Path'])) {
                         $oldAbs = realpath(__DIR__ . '/..' . '/' . ltrim($complaint['Salaysay_Path'], '/'));
@@ -2313,7 +2314,7 @@ $(document).ready(function(){
     </div>
 </div>
 
-<?php $conn->close(); ?>
+<?php  ?>
 
 </body>
 </html>

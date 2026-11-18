@@ -1,4 +1,4 @@
-
+<?php require_once __DIR__ . '/../includes/bootstrap.php'; ?>
 <style>
 /* Chatbot Button Styles */
 .chatbot-button {

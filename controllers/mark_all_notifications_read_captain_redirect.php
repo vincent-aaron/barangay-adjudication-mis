@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 // controllers/mark_all_notifications_read_captain_redirect.php
 // Direct (non-AJAX) endpoint to mark captain notifications as read, then redirect back with a status.
 

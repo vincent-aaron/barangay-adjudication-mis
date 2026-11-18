@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 // Ensure the application's session is started (server.php calls session_start()
 // and also provides the DB connection used throughout this page).
 require_once __DIR__ . '/../server/server.php'; // provides $conn and starts session
@@ -175,12 +176,12 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
                 $error_message = 'The following files exceed the 20MB limit: '.htmlspecialchars(implode(', ', $oversized));
             } else {
                 $uploadDir = __DIR__.'/../uploads/';
-                if(!is_dir($uploadDir)) @mkdir($uploadDir,0777,true);
+                if(!is_dir($uploadDir)) @mkdir($uploadDir,0755,true);
                 foreach($_FILES['complaint_attachment']['name'] as $idx => $origName){
                     if($_FILES['complaint_attachment']['error'][$idx] === UPLOAD_ERR_OK){
                         $safe = time().'_'.preg_replace('/[^A-Za-z0-9_.-]/','_', $origName);
                         $target = $uploadDir.$safe;
-                        if(move_uploaded_file($_FILES['complaint_attachment']['tmp_name'][$idx], $target)){
+                        if(bpamis_safe_move($_FILES['complaint_attachment']['tmp_name'][$idx], $target)){
                             $stored_paths[] = 'uploads/'.$safe;
                         }
                     }
@@ -273,7 +274,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Submit Complaint</title>
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css">

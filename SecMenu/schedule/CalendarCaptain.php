@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../../includes/bootstrap.php';
+
 require_once('db-connect.php');
 
 ?>
@@ -473,7 +474,7 @@ require_once('db-connect.php');
         $row['description'] = $row['remarks'];
         $sched_res[$row['hearingID']] = $row;
     }
-    if(isset($conn)) $conn->close();
+    if(isset($conn)) 
   ?>
   
   <script>

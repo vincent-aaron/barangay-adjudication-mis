@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../../includes/bootstrap.php';
+
 /**
  * Sync Hearing Visibility
  * 
@@ -37,5 +38,4 @@ if ($result) {
     ]);
 }
 
-$conn->close();
 ?>

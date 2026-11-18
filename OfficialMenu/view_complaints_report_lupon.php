@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 
 include '../controllers/session_control.php';
 include_once __DIR__ . '/../server/server.php';
@@ -61,7 +62,6 @@ if ($statusResult) {
     }
 }
 
-$conn->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -69,7 +69,7 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Complaints Report</title>
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -226,7 +226,6 @@ if ($result->num_rows > 0) {
 } else {
     echo '<tr><td colspan="6" class="p-4 text-center text-gray-500">No complaints found.</td></tr>';
 }
-$conn->close();
 ?>
                     </tbody>
                 </table>

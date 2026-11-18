@@ -1,8 +1,9 @@
-<?php
+<?php require_once __DIR__ . '/../../includes/bootstrap.php';
+
 require_once('db-connect.php');
 
 if (session_status() === PHP_SESSION_NONE) {
-  session_start();
+  if (session_status() === PHP_SESSION_NONE) { session_start(); }
 }
 
 
@@ -550,9 +551,9 @@ if (!empty($lupon_name)) {
           $ps->close();
         }
 
-        // Additional respondents from COMPLAINT_RESPONDENTS (if any)
+        // Additional respondents from complaint_respondents (if any)
         if (!empty($complaintId)) {
-          $addRespSql = "SELECT ri.First_Name, ri.Last_Name FROM COMPLAINT_RESPONDENTS cr JOIN RESIDENT_INFO ri ON cr.Respondent_ID = ri.Resident_ID WHERE cr.Complaint_ID = ?";
+          $addRespSql = "SELECT ri.First_Name, ri.Last_Name FROM complaint_respondents cr JOIN resident_info ri ON cr.Respondent_ID = ri.Resident_ID WHERE cr.Complaint_ID = ?";
           if ($ars = $conn->prepare($addRespSql)) {
             $ars->bind_param('i', $complaintId);
             $ars->execute();
@@ -602,7 +603,7 @@ if (!empty($lupon_name)) {
   }
 }
 
-if (isset($conn)) $conn->close();
+if (isset($conn)) 
 
 ?>
 

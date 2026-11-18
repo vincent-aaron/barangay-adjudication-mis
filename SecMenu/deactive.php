@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 // Expects $account to be present in scope with keys: account_type, id, isActive, email, name
 if (!isset($account)) return;
 $type = $account['account_type'];

@@ -1,5 +1,5 @@
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
 
-<?php
 include '../controllers/session_control.php';
 include '../server/server.php';
 
@@ -52,7 +52,7 @@ while ($row = $monthResult->fetch_assoc()) {
 }
 
 if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+    if (session_status() === PHP_SESSION_NONE) { session_start(); }
 }
 $pageTitle = "View Case Reports";
 ?>
@@ -63,7 +63,7 @@ $pageTitle = "View Case Reports";
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Case Reports</title>
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>

@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../../includes/bootstrap.php';
+
 include_once __DIR__ . '/../../server/server.php';
 $editMode = false;
 $editData = [];

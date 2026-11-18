@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 // Lightweight summary endpoint for unread notifications (used for auto-updating nav badge)
 // Returns: { count: number }
 
@@ -225,5 +226,5 @@ try {
     echo json_encode(['count' => $count]);
 } catch (Throwable $e) {
     http_response_code(500);
-    echo json_encode(['count' => 0, 'error' => true, 'msg' => $e->getMessage()]);
+    echo json_encode(['count' => 0, 'error' => true]);
 }

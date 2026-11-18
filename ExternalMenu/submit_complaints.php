@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 // External Submit Complaints (self-processing) - adds record to COMPLAINT_INFO like resident version
 include '../controllers/session_control.php';
 include '../server/server.php';
@@ -109,12 +110,12 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
                 }
             }
             if(empty($oversized)){
-                $uploadDir = __DIR__.'/../uploads/'; if(!is_dir($uploadDir)) @mkdir($uploadDir,0777,true);
+                $uploadDir = __DIR__.'/../uploads/'; if(!is_dir($uploadDir)) @mkdir($uploadDir,0755,true);
                 foreach($_FILES['complaint_attachment']['name'] as $i=>$name){
                     if($_FILES['complaint_attachment']['error'][$i]===UPLOAD_ERR_OK){
                         $safe = time().'_'.clean_name($name);
                         $target = $uploadDir.$safe;
-                        if(move_uploaded_file($_FILES['complaint_attachment']['tmp_name'][$i], $target)){
+                        if(bpamis_safe_move($_FILES['complaint_attachment']['tmp_name'][$i], $target)){
                             $stored[] = 'uploads/'.$safe;
                         }
                     }
@@ -127,7 +128,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
 
         if($error_message===''){
             $status='Pending';
-            // Insert into COMPLAINT_INFO using external user mapped into Resident_ID if schema requires; if an External_ID column exists, adjust as needed.
+            // Insert into complaint_info using external user mapped into Resident_ID if schema requires; if an External_ID column exists, adjust as needed.
             if(isset($conn)){
                 // Prefer external_complainant_id column; fallback to Resident_ID if external column not present
                 $useExternalCol = false;
@@ -200,7 +201,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
                 $rid = $conn->insert_id;
             }
 
-            // ✅ Insert into COMPLAINT_RESPONDENTS
+            // ✅ Insert into complaint_respondents
             $conn->query("INSERT INTO complaint_respondents (Complaint_ID, Respondent_ID) VALUES ($complaint_id, $rid)");
 
             // ✅ Send notification to respondent (optional)
@@ -233,7 +234,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css">
     <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
 
     <script>
         tailwind.config = {

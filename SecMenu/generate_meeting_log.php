@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 // Generate printable meeting log document
 include '../controllers/session_control.php';
 include_once __DIR__ . '/../server/server.php';
@@ -249,7 +250,7 @@ if ($download && $log) {
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+<link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
 <title>Generate Meeting Log</title>
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <script src="https://cdn.tailwindcss.com"></script>

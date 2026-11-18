@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../../includes/bootstrap.php';
+
 require_once(__DIR__ . '/../../server/server.php');
 include __DIR__ . '/../../controllers/session_control.php';
 
@@ -34,7 +35,7 @@ if ($sched_stmt) {
                             WHEN cs.Case_Status = 'Arbitration' THEN ai.Mediator_Name
                             ELSE NULL
                         END AS lupon_tagapamayapa
-                    FROM CASE_INFO cs
+                    FROM case_info cs
                     LEFT JOIN mediation_info mi ON cs.Case_ID = mi.Case_ID
                     LEFT JOIN conciliation ci ON cs.Case_ID = ci.Case_ID
                     LEFT JOIN resolution ri ON cs.Case_ID = ri.Case_ID
@@ -55,7 +56,7 @@ if ($sched_stmt) {
                 }
                 
                 // Also fetch case_original_id, case status and complaint title for display
-                $case_info_sql = "SELECT Case_ID, case_original_id, Case_Status, Complaint_ID FROM CASE_INFO WHERE Case_ID = ? LIMIT 1";
+                $case_info_sql = "SELECT Case_ID, case_original_id, Case_Status, Complaint_ID FROM case_info WHERE Case_ID = ? LIMIT 1";
                 if ($ci = $conn->prepare($case_info_sql)) {
                     $ci->bind_param('i', $case_id);
                     if ($ci->execute()) {
@@ -111,9 +112,9 @@ if ($sched_stmt) {
 
             // Final fallback: case_info.lupon_assign
             if (empty($resp['lupon']) && !empty($case_id)) {
-                $chk2 = $conn->query("SHOW COLUMNS FROM CASE_INFO LIKE 'lupon_assign'");
+                $chk2 = $conn->query("SHOW COLUMNS FROM case_info LIKE 'lupon_assign'");
                 if ($chk2 && $chk2->num_rows > 0) {
-                    $q2 = $conn->prepare("SELECT lupon_assign FROM CASE_INFO WHERE Case_ID = ? LIMIT 1");
+                    $q2 = $conn->prepare("SELECT lupon_assign FROM case_info WHERE Case_ID = ? LIMIT 1");
                     if ($q2) {
                         $q2->bind_param('i', $case_id);
                         if ($q2->execute()) {

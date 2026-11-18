@@ -1,5 +1,6 @@
-<?php
-session_start();
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 // Load site settings for dynamic barangay info
 try {
     include_once(__DIR__ . '/../server/server.php');
@@ -66,7 +67,7 @@ $womenChildrenPercent = $population > 0 ? (($womenChildren / $population) * 100.
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/marquee.css">
     <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="assets/js/marquee.js" defer></script>
 
@@ -5855,7 +5856,7 @@ $womenChildrenPercent = $population > 0 ? (($womenChildren / $population) * 100.
                             </div>
                             <div>
                                 <div class="font-semibold text-gray-900">Email Support</div>
-                                <div class="text-sm text-blue-600 font-medium">support@bpamis.gov.ph</div>
+                                <div class="text-sm text-blue-600 font-medium">support@example.com</div>
                             </div>
                         </div>
 
@@ -6143,7 +6144,7 @@ $womenChildrenPercent = $population > 0 ? (($womenChildren / $population) * 100.
                                     </ol>
                                     <p class="mt-2">Your account will need to be verified before you can use all
                                         features.</p>
-                                    <a href="../register.php"
+                                    <a href="register.php"
                                         class="mt-2 inline-block text-sm text-blue-600 hover:text-blue-800 font-medium">Register
                                         Now <i class="fas fa-arrow-right ml-1"></i></a>
                                 </div>
@@ -6346,7 +6347,7 @@ $womenChildrenPercent = $population > 0 ? (($womenChildren / $population) * 100.
                                         <i class="fas fa-envelope text-blue-600 mt-1 mr-3"></i>
                                         <div>
                                             <p class="text-gray-700 font-medium">Email Support</p>
-                                            <p class="text-gray-600">support@bpamis.gov.ph</p>
+                                            <p class="text-gray-600">support@example.com</p>
                                             <p class="text-sm text-gray-500">We aim to respond within 24 hours</p>
                                         </div>
                                     </div>
@@ -7250,7 +7251,6 @@ $womenChildrenPercent = $population > 0 ? (($womenChildren / $population) * 100.
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap">
     </script>
 
-    <?php include_once('../includes/case_assistant.php'); ?>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const infoContainers = document.querySelectorAll('.info-container');

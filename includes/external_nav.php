@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/bootstrap.php';
+
 require_once __DIR__ . '/../server/server.php';
 require_once __DIR__ . '/db_compat.php';
 $resident_id = $_SESSION['user_id'] ?? 0;
@@ -151,7 +152,7 @@ if ($resident_id > 0) {
                 </div>
                 <span class="text-xs font-medium">Notifications</span>
             </a>
-            <a href="../login.php" class="w-24 h-24 flex flex-col items-center justify-center rounded-xl text-red-600 hover:bg-red-50 hover-float transition-all logout-link">
+            <a href="../bpamis_website/login.php" class="w-24 h-24 flex flex-col items-center justify-center rounded-xl text-red-600 hover:bg-red-50 hover-float transition-all logout-link">
                 <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mb-2 shadow-sm">
                     <i class="fas fa-sign-out-alt text-red-500 text-xl"></i>
                 </div>

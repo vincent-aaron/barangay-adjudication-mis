@@ -1,5 +1,6 @@
-<?php
-session_start();
+<?php require_once __DIR__ . '/../../includes/bootstrap.php';
+
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 require_once('db-connect.php');
 include('../../server/server.php');
 
@@ -10,7 +11,7 @@ if (!isset($_SESSION['user_id'])) {
 
 $Resident_ID = $_SESSION['user_id'];
 
-$val = $conn->query("SELECT * FROM barangay_case_management.resident_info WHERE Resident_ID = $Resident_ID");
+$val = $conn->query("SELECT * FROM resident_info WHERE Resident_ID = $Resident_ID");
 if ($val->num_rows == 0) {
   echo "<script>alert('Resident not found.'); window.location.href='login.php';</script>";
   exit;
@@ -20,10 +21,10 @@ $events = [];
 $hearings_list = [];
 $hearing_stmt = $conn->prepare("
   SELECT DISTINCT sl.hearingID, sl.hearingTitle, sl.hearingDateTime, sl.remarks, ci.Case_ID
-  FROM barangay_case_management.schedule_list sl
-  JOIN barangay_case_management.case_info ci ON sl.Case_ID = ci.Case_ID
-  JOIN barangay_case_management.complaint_info co ON ci.Complaint_ID = co.Complaint_ID
-  LEFT JOIN barangay_case_management.complaint_respondents cr ON co.Complaint_ID = cr.Complaint_ID
+  FROM schedule_list sl
+  JOIN case_info ci ON sl.Case_ID = ci.Case_ID
+  JOIN complaint_info co ON ci.Complaint_ID = co.Complaint_ID
+  LEFT JOIN complaint_respondents cr ON co.Complaint_ID = cr.Complaint_ID
   WHERE (
     co.Resident_ID = ? 
     OR COALESCE(co.respondent_id, co.Respondent_ID) = ?
@@ -58,8 +59,8 @@ $hearing_stmt->close();
 $cases = [];
 $case_stmt = $conn->prepare("
     SELECT ci.Case_ID, ci.Case_Status, ci.Date_Opened, co.Complaint_Title
-    FROM barangay_case_management.case_info ci
-    JOIN barangay_case_management.complaint_info co ON ci.Complaint_ID = co.Complaint_ID
+    FROM case_info ci
+    JOIN complaint_info co ON ci.Complaint_ID = co.Complaint_ID
     WHERE co.Resident_ID = ?
     ORDER BY ci.Date_Opened DESC
 ");
@@ -87,7 +88,6 @@ while ($c = $case_res->fetch_assoc()) {
 }
 $case_stmt->close();
 
-$conn->close();
 
 $events_json = json_encode($events);
 $cases_json = json_encode($cases);

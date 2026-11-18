@@ -1,11 +1,12 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 include '../server/server.php';
 include 'ocr_handler.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
 $id = intval($_POST['id'] ?? 0);
-$useOCR = intval($_POST['useOCR'] ?? $_POST['useocr'] ?? 1);
+$useOCR = bpamis_demo_mode() ? 0 : intval($_POST['useOCR'] ?? $_POST['useocr'] ?? 1);
 
 if ($id <= 0) {
     echo json_encode(['success' => false, 'message' => 'Invalid resident ID']);
@@ -56,11 +57,11 @@ if (!$foundPath) {
     if (file_exists($legacy)) $foundPath = $legacy;
 }
 if (!$foundPath) {
-    echo json_encode(['success' => false, 'message' => 'Valid ID file not found on server', 'attempts' => $attempts]);
+    echo json_encode(['success' => false, 'message' => 'Valid ID file not found on server']);
     exit;
 }
 
-$webUrl = '../' . ltrim(str_replace('\\', '/', $validIdPath), '/');
+$webUrl = '../controllers/view_valid_id.php?id=' . $id;
 
 if (!$useOCR) {
     echo json_encode([

@@ -1,5 +1,5 @@
-<?php
-// filepath: c:\xampp\htdocs\BPAMIS_01\includes\push_config.php
+<?php require_once __DIR__ . '/bootstrap.php';
+
 // Push Notification Configuration for Cross-Device Deployment
 
 /**
@@ -15,7 +15,7 @@ function getPushBaseUrl() {
     $protocol = $isHttps ? 'https' : 'http';
     
     // Get host (handles proxy/load balancer scenarios)
-    $host = $_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
     
     // Determine app root from REQUEST_URI
     $pathParts = array_values(array_filter(explode('/', $_SERVER['REQUEST_URI'] ?? '')));
@@ -45,23 +45,10 @@ function isAllowedOrigin($origin) {
     if (empty($origin)) return false;
     
     $config = getPushBaseUrl();
-    $host = $config['host'];
-    
-    // Allow same host, localhost, and 127.0.0.1
-    $allowed = [
-        $host,
-        'localhost',
-        '127.0.0.1',
-        'localhost:' . ($_SERVER['SERVER_PORT'] ?? '80'),
-    ];
-    
-    foreach ($allowed as $allowedHost) {
-        if (strpos($origin, $allowedHost) !== false) {
-            return true;
-        }
-    }
-    
-    return false;
+    $originHost = parse_url($origin, PHP_URL_HOST);
+    $originPort = parse_url($origin, PHP_URL_PORT);
+    $full = $originHost . ($originPort ? ':' . $originPort : '');
+    return is_string($originHost) && (strcasecmp($full, $config['host']) === 0 || strcasecmp($originHost, $config['host']) === 0);
 }
 
 /**

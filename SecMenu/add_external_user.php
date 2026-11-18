@@ -1,5 +1,5 @@
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
 
-<?php
 // Admin-style Add External User page: premium form + table of existing accounts
 require_once(__DIR__ . '/../server/server.php');
 include '../controllers/session_control.php';
@@ -22,7 +22,7 @@ if (isset($conn)) {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Add External User • Admin</title>
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <script src="https://cdn.tailwindcss.com"></script>

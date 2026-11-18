@@ -1,5 +1,5 @@
-<?php
-// filepath: c:\xampp\htdocs\BPAMIS_01\controllers\push_notifications.php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 if (session_status() === PHP_SESSION_NONE) session_start();
 require_once __DIR__ . '/../server/server.php';
 
@@ -184,7 +184,7 @@ try {
     $stmt = $conn->prepare($sql);
     if (!$stmt) {
         http_response_code(500);
-        echo json_encode(['success'=>false,'message'=>'SQL prepare error','err'=>$conn->error]);
+        echo json_encode(['success'=>false,'message'=>'SQL prepare error']);
         exit;
     }
 
@@ -196,7 +196,7 @@ try {
 
     if (!$stmt->execute()) {
         http_response_code(500);
-        echo json_encode(['success'=>false,'message'=>'SQL execute error','err'=>$stmt->error]);
+        echo json_encode(['success'=>false,'message'=>'SQL execute error']);
         $stmt->close();
         exit;
     }
@@ -281,7 +281,7 @@ try {
 } catch (Throwable $e) {
     error_log('push_notifications.php error: '.$e->getMessage());
     http_response_code(500);
-    echo json_encode(['success'=>false,'message'=>'Server error','err'=>$e->getMessage()]);
+    echo json_encode(['success'=>false,'message'=>'Server error']);
     exit;
 }
 

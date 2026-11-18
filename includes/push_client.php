@@ -1,12 +1,13 @@
-<?php
-// emits a JS snippet usable on any page path under /BPAMIS_01 (or /BPAMIS on ngrok)
+<?php require_once __DIR__ . '/bootstrap.php';
+
+// Emits the notification client for the current page.
 // Start session if possible. If headers are already sent we skip starting to avoid PHP warnings
 // (headers may be sent by templates/includes or accidental whitespace/BOM). Skipping here
 // preserves existing behavior when a session is already active; it only avoids noisy
 // warnings when starting sessions after output has begun.
 if (session_status() === PHP_SESSION_NONE) {
   if (!headers_sent()) {
-    session_start();
+    if (session_status() === PHP_SESSION_NONE) { session_start(); }
   } else {
     // Log for diagnostics; this indicates some output was sent before session start.
     error_log("push_client.php: session_start skipped because headers were already sent for " . ($_SERVER['REQUEST_URI'] ?? 'unknown'));
@@ -19,16 +20,7 @@ if (!empty($_SESSION['user_id']))     $userKey = 'user_'     . (int)$_SESSION['u
 <script>
 (function(){
   // Derive app root dynamically.
-  // If the app is deployed under a folder (e.g. /BPAMIS/SecMenu/...), APP_ROOT = '/BPAMIS'.
-  // If deployed at domain root (e.g. /SecMenu/...), APP_ROOT = '' (root).
-  const pathParts = location.pathname.split('/').filter(Boolean);
-  const KNOWN_TOP_LEVEL = new Set([
-    'SecMenu','LuponHeadMenu','OfficialMenu','ResidentMenu','ExternalMenu',
-    'controllers','includes','bpamis_website','Assets','assets','uploads','uploads_id',
-    'vendor','src','server','sql','tools','chatbot','phpmailer','PhpSpreadsheet'
-  ]);
-  const firstSeg = pathParts.length ? pathParts[0] : '';
-  const APP_ROOT = (firstSeg && !KNOWN_TOP_LEVEL.has(firstSeg)) ? ('/' + firstSeg) : '';
+  const APP_ROOT = <?php echo json_encode(BPAMIS_BASE); ?>;
 
   function withRoot(p){
     // p must start with '/'

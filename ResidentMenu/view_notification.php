@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 require_once __DIR__ . '/../controllers/session_control.php';
 require_once __DIR__ . '/../server/server.php';
 require_once __DIR__ . '/../includes/db_compat.php';
@@ -27,8 +28,8 @@ $TB_RESIDENT_INFO = bpamis_quote_table($T_RESIDENT_INFO);
 $TB_CASE_INFO = bpamis_quote_table($T_CASE_INFO);
 
 // Fetch notification
-$stmt = $conn->prepare("SELECT * FROM {$TB_NOTIFICATIONS} WHERE notification_id = ?");
-$stmt->bind_param('i', $notificationId);
+$stmt = $conn->prepare("SELECT * FROM {$TB_NOTIFICATIONS} WHERE notification_id = ? AND resident_id = ?");
+$stmt->bind_param('ii', $notificationId, $resident_id);
 $stmt->execute();
 $rows = bpamis_stmt_fetch_all_assoc($stmt);
 if (empty($rows)) {
@@ -130,7 +131,7 @@ if (!empty($notification['message']) && preg_match('/converted\s+to\s+case/i', $
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Notification • Details</title>
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {

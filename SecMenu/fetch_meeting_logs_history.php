@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 include_once __DIR__ . '/../server/server.php';
 
 $status_filter = $_GET['status'] ?? 'All';
@@ -103,5 +104,4 @@ if ($result->num_rows > 0) {
           </tr>";
 }
 
-$conn->close();
 ?>

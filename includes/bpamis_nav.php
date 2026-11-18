@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/bootstrap.php'; ?>
 <nav class="bg-white shadow-lg">
     <div class="container mx-auto px-4">
         <div class="flex justify-between items-center h-16">

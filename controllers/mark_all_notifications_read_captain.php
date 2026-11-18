@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 // controllers/mark_all_notifications_read_captain.php
 // Marks only captain-relevant notifications as read (captain-specific flag when present)
 
@@ -40,5 +41,5 @@ try {
     exit;
 } catch (Throwable $e) {
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    echo json_encode(['success' => false, 'message' => 'Server error']);
 }

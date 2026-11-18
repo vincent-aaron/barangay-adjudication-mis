@@ -1,41 +1,9 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 // session_control.php
 // Usage: include 'session_control.php'; at TOP of each protected page
 
-// // Adopt an active, VALID role-based session if present; ignore and purge stale cookies.
 // if (session_status() === PHP_SESSION_NONE) {
-//     $names = ['BPAMIS_RESIDENT','BPAMIS_EXTERNAL','BPAMIS_SEC','BPAMIS_OFFICIAL','BPAMIS_LUPONHEAD','BPAMIS_APP'];
-//     $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
-//     $picked = null;
-//     foreach ($names as $n) {
-//         if (empty($_COOKIE[$n])) continue;
-//         if (session_status() === PHP_SESSION_ACTIVE) { session_write_close(); }
-//         @session_name($n);
-//         @session_start();
-//         $role = strtolower($_SESSION['role'] ?? '');
-//         $auth = !empty($_SESSION['AUTH_VERIFIED']);
-//         $valid = false;
-//         if ($role === 'resident') {
-//             $valid = $auth && !empty($_SESSION['user_id']) && !empty($_SESSION['username']);
-//         } elseif ($role === 'external') {
-//             $valid = $auth && !empty($_SESSION['user_id']) && !empty($_SESSION['username']);
-//         } elseif ($role === 'official') {
-//             $valid = $auth && !empty($_SESSION['official_id']) && !empty($_SESSION['official_position']);
-//         } else {
-//             $valid = $auth && (!empty($_SESSION['user_id']) || !empty($_SESSION['official_id']));
-//         }
-//         if ($valid) { $picked = $n; break; }
-//         // Purge stale cookie session
-//         $_SESSION = [];
-//         @session_unset();
-//         @session_destroy();
-//         foreach (['/','/BPAMIS','/BPAMIS/'] as $p) { @setcookie($n, '', time()-3600, $p, '', $secure, true); }
-//         if (session_status() === PHP_SESSION_ACTIVE) { session_write_close(); }
-//     }
-//     if (!$picked) {
-//         // Start a default anonymous session
-//         @session_start();
-//     }
 // }
 
 // ==============================
@@ -48,10 +16,7 @@ $warning_limit  = 300 ; // show warning after 300 seconds (handled by JS)
 // After the warning is shown, wait this many seconds then auto-logout and redirect
 $post_warning_logout_seconds = 30; // 30 seconds countdown after the warning
 
-// // Force session regeneration every request to prevent tab reuse issues
 // if (!isset($_SESSION['regenerated'])) {
-//     session_regenerate_id(true);
-//     $_SESSION['regenerated'] = time();
 // }
 
 // ==============================
@@ -59,7 +24,7 @@ $post_warning_logout_seconds = 30; // 30 seconds countdown after the warning
 // ==============================
 // Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+    if (session_status() === PHP_SESSION_NONE) { session_start(); }
 }
 
 // Check if user is logged in by looking for common session variables
@@ -67,7 +32,7 @@ $is_logged_in = (!empty($_SESSION['user_id']) || !empty($_SESSION['official_id']
 
 if (!$is_logged_in) {
     // Redirect to the centralized login page inside bpamis_website
-    header('Location: /BPAMIS/bpamis_website/bpamis.php');
+    header('Location: ' . BPAMIS_BASE . '/bpamis_website/bpamis.php');
     exit();
 }
 
@@ -88,7 +53,7 @@ if (isset($_SESSION['last_activity'])) {
             if (isset($_COOKIE[$n])) {
                 if (session_status() === PHP_SESSION_ACTIVE) { session_write_close(); }
                 session_name($n);
-                @session_start();
+                if (session_status() === PHP_SESSION_NONE) { session_start(); }
                 $_SESSION = [];
                 @session_unset();
                 @session_destroy();
@@ -104,7 +69,7 @@ if (isset($_SESSION['last_activity'])) {
     echo "try { localStorage.setItem('bpamis-logout', Date.now().toString()); } catch(e) {}\n";
     // Broadcast across channels so both new and legacy listeners handle it
     echo "try { if ('BroadcastChannel' in window) { new BroadcastChannel('bpamis-auth').postMessage({type:'logged-out'}); new BroadcastChannel('bpamis-channel').postMessage('logout'); } } catch(e) {}\n";
-    echo "window.location.href = '/BPAMIS/bpamis_website/bpamis.php?timeout=true';";
+    echo 'window.location.href = ' . json_encode(bpamis_url('bpamis_website/bpamis.php?timeout=true')) . ';';
     echo '</script></body></html>';
     exit();
     }
@@ -114,19 +79,19 @@ $_SESSION['last_activity'] = time();
 // Prepare optional cross-tab login seed info (so login.php in another tab can detect active session)
 $__sc_is_logged = (!empty($_SESSION['user_id']) || !empty($_SESSION['official_id']) || !empty($_SESSION['user']));
 $__sc_display = '';
-$__sc_redirect = '/BPAMIS/bpamis_website/bpamis.php';
+$__sc_redirect = (BPAMIS_BASE . '/bpamis_website/bpamis.php');
 if ($__sc_is_logged) {
     $__sc_display = $_SESSION['username'] ?? $_SESSION['official_name'] ?? $_SESSION['user'] ?? '';
     $role = strtolower($_SESSION['role'] ?? '');
-    if ($role === 'resident') { $__sc_redirect = '/ResidentMenu/home-resident.php'; }
-    elseif ($role === 'external') { $__sc_redirect = '/ExternalMenu/home-external.php'; }
+    if ($role === 'resident') { $__sc_redirect = BPAMIS_BASE . '/ResidentMenu/home-resident.php'; }
+    elseif ($role === 'external') { $__sc_redirect = BPAMIS_BASE . '/ExternalMenu/home-external.php'; }
     elseif ($role === 'official') {
         $pos = strtolower($_SESSION['official_position'] ?? '');
-        if (strpos($pos, 'barangay secretary') !== false) $__sc_redirect = '/SecMenu/home-secretary.php';
-        elseif (strpos($pos, 'lupon-hepe') !== false || strpos($pos, 'lupon head') !== false) $__sc_redirect = '/LuponHeadMenu/home-luponhead.php';
-        elseif (strpos($pos, 'lupon tagapamayapa') !== false) $__sc_redirect = '/OfficialMenu/home-lupon.php';
-        elseif (strpos($pos, 'barangay captain') !== false) $__sc_redirect = '/OfficialMenu/home-captain.php';
-        else $__sc_redirect = '/SecMenu/home-secretary.php';
+        if (strpos($pos, 'barangay secretary') !== false) $__sc_redirect = BPAMIS_BASE . '/SecMenu/home-secretary.php';
+        elseif (strpos($pos, 'lupon-hepe') !== false || strpos($pos, 'lupon head') !== false) $__sc_redirect = BPAMIS_BASE . '/LuponHeadMenu/home-luponhead.php';
+        elseif (strpos($pos, 'lupon tagapamayapa') !== false) $__sc_redirect = BPAMIS_BASE . '/OfficialMenu/home-lupon.php';
+        elseif (strpos($pos, 'barangay captain') !== false) $__sc_redirect = BPAMIS_BASE . '/OfficialMenu/home-captain.php';
+        else $__sc_redirect = BPAMIS_BASE . '/SecMenu/home-secretary.php';
     }
 }
 
@@ -167,9 +132,9 @@ function resolveBpamisRedirect(query){
     candidates.push('../../bpamis_website/bpamis.php' + query); // in case we are one level deeper
     // Absolute variants
     candidates.push('/bpamis_website/bpamis.php' + query);
-    candidates.push('/BPAMIS/bpamis_website/bpamis.php' + query);
+    candidates.push('<?= BPAMIS_BASE ?>/bpamis_website/bpamis.php' + query);
     candidates.push('/bpamis.php' + query); // fallback to possible root landing
-    candidates.push('/BPAMIS/bpamis.php' + query);
+    candidates.push('<?= BPAMIS_BASE ?>/bpamis.php' + query);
     // Deduplicate while preserving order
     const seen = new Set();
     const ordered = candidates.filter(c=>{ if(seen.has(c)) return false; seen.add(c); return true; });
@@ -194,12 +159,7 @@ function resolveBpamisRedirect(query){
 function resolveLogoutEndpoint(){
     const candidates = [];
     // Relative first (most common when included from role folders)
-    candidates.push('../controllers/logoutdb.php');
-    candidates.push('../../controllers/logoutdb.php');
-    // Absolute variants
-    candidates.push('/controllers/logoutdb.php');
-    candidates.push('/BPAMIS/controllers/logoutdb.php');
-    candidates.push('/bpamis/controllers/logoutdb.php');
+    candidates.push(<?php echo json_encode(bpamis_url('controllers/logoutdb.php')); ?>);
     // Deduplicate
     const seen = new Set();
     const ordered = candidates.filter(c=>{ if(seen.has(c)) return false; seen.add(c); return true; });
@@ -433,7 +393,7 @@ function hideWarning(){
 function getBasePrefix(){
     try {
         const parts = (location.pathname || '').split('/').filter(Boolean);
-        return parts.includes('BPAMIS') ? '/BPAMIS' : '';
+        return <?php echo json_encode(BPAMIS_BASE); ?>;
     } catch(e) { return ''; }
 }
 

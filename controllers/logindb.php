@@ -1,11 +1,7 @@
-<?php
-// Start a minimal session; we'll migrate to a role-specific namespace after login
-if (session_status() === PHP_SESSION_NONE) session_start();
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../server/server.php';
 require_once __DIR__ . '/../includes/db_compat.php';
-
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+require_once __DIR__ . '/../includes/rate_limit.php';
 
 $email = trim($_POST['login_user'] ?? '');
 $password = $_POST['login_pass'] ?? '';
@@ -13,198 +9,123 @@ $isAjax = isset($_POST['ajax']);
 
 $loginPage = '../bpamis_website/login.php';
 
-$T_BARANGAY_OFFICIALS = bpamis_table($conn, 'barangay_officials');
-$T_RESIDENT_INFO = bpamis_table($conn, 'resident_info');
-$T_EXTERNAL_COMPLAINANT = bpamis_table($conn, 'external_complainant');
-
-$TB_BARANGAY_OFFICIALS = bpamis_quote_table($T_BARANGAY_OFFICIALS);
-$TB_RESIDENT_INFO = bpamis_quote_table($T_RESIDENT_INFO);
-$TB_EXTERNAL_COMPLAINANT = bpamis_quote_table($T_EXTERNAL_COMPLAINANT);
-
-// basic empty check
-if (empty($email) || empty($password)) {
+/** Sends a login failure in the format the calling page expects. */
+function bpamis_login_fail(string $message, bool $isAjax, string $target, array $extra = []): void
+{
     if ($isAjax) {
         header('Content-Type: application/json');
-        echo json_encode(['success' => false, 'message' => 'Please enter both email and password.']);
+        echo json_encode(array_merge(['success' => false, 'message' => $message], $extra));
         exit;
     }
-    echo "<script>alert('Please enter both email and password.'); window.location.href='{$loginPage}';</script>";
+    echo '<script>alert(' . json_encode($message) . '); window.location.href=' . json_encode($target) . ';</script>';
     exit;
 }
 
-/*
- * We'll try these queries in order: officials, residents, external complainants.
- * Use COALESCE to support both 'password' and possible alternative column names like 'resident_password'.
- */
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
+    header('Location: ' . $loginPage);
+    exit;
+}
+
+// basic empty check
+if ($email === '' || $password === '') {
+    bpamis_login_fail('Please enter both email and password.', $isAjax, $loginPage);
+}
+
+// Slow down password guessing: 10 failed attempts per email and address in 15 minutes.
+$rateIdentity = $email . '|' . bpamis_client_ip();
+if (bpamis_rate_exceeded($conn, 'login', $rateIdentity, 10, 900)) {
+    bpamis_login_fail('Too many failed attempts. Please wait 15 minutes and try again.', $isAjax, $loginPage);
+}
+
+$TB_BARANGAY_OFFICIALS = bpamis_quote_table(bpamis_table($conn, 'barangay_officials'));
+$TB_RESIDENT_INFO = bpamis_quote_table(bpamis_table($conn, 'resident_info'));
+$TB_EXTERNAL_COMPLAINANT = bpamis_quote_table(bpamis_table($conn, 'external_complainant'));
+
+// Officials, then residents, then external complainants.
 $queries = [
-    // officials
-    "SELECT official_id AS id, official_username AS username, email,isActive, COALESCE(password) AS password, `Name`, Position, 'official' AS user_role
-    FROM {$TB_BARANGAY_OFFICIALS}
-     WHERE email = ? LIMIT 1",
-    // residents
-    "SELECT resident_id AS id, resident_username AS username, email, isVerify, isActive, COALESCE(password) AS password, 'resident' AS user_role
-    FROM {$TB_RESIDENT_INFO}
-     WHERE email = ?  LIMIT 1",
-    // external complainants
-    "SELECT external_complaint_id AS id, external_username AS username, email, isActive, COALESCE(password) AS password, 'external' AS user_role
-    FROM {$TB_EXTERNAL_COMPLAINANT}
-     WHERE email = ? LIMIT 1"
+    "SELECT Official_ID AS id, official_username AS username, email, isActive, password, `Name`, Position, 'official' AS user_role
+     FROM {$TB_BARANGAY_OFFICIALS} WHERE email = ? LIMIT 1",
+    "SELECT Resident_ID AS id, Resident_Username AS username, email, isVerify, isActive, Password AS password, 'resident' AS user_role
+     FROM {$TB_RESIDENT_INFO} WHERE email = ? LIMIT 1",
+    "SELECT External_Complaint_ID AS id, External_Username AS username, email, isActive, password, 'external' AS user_role
+     FROM {$TB_EXTERNAL_COMPLAINANT} WHERE email = ? LIMIT 1",
 ];
 
 $user = null;
-$user_type_found = null;
-
 foreach ($queries as $query) {
     $stmt = $conn->prepare($query);
-if (!$stmt) {
-    if ($isAjax) {
-        header('Content-Type: application/json');
-        echo json_encode([
-            'success' => false,
-            'message' => 'SQL prepare failed: ' . $conn->error
-        ]);
-        exit;
+    if (!$stmt) {
+        error_log('logindb: prepare failed: ' . $conn->error);
+        bpamis_login_fail('Login is temporarily unavailable. Please try again later.', $isAjax, $loginPage);
     }
-    die("Query prepare failed: " . $conn->error);
-}
-
-    $stmt->bind_param("s", $email);
+    $stmt->bind_param('s', $email);
     $stmt->execute();
     $rows = bpamis_stmt_fetch_all_assoc($stmt);
-
+    $stmt->close();
     if (count($rows) === 1) {
         $user = $rows[0];
-        $user_type_found = $user['user_role'] ?? null;
-        $stmt->close();
         break;
     }
-    $stmt->close();
 }
 
-// If no matching user found
-if (!$user) {
-    if ($isAjax) {
-        header('Content-Type: application/json');
-        echo json_encode(['success' => false, 'message' => 'No account found with this email.']);
-        exit;
-    }
-    echo "<script>alert('No account found with this email.'); window.location.href='{$loginPage}';</script>";
-    exit;
+// The same message is used for an unknown email and a wrong password.
+if (!$user || empty($user['password']) || !password_verify($password, $user['password'])) {
+    bpamis_rate_hit($conn, 'login', $rateIdentity, 900);
+    bpamis_login_fail('Invalid email or password.', $isAjax, $loginPage);
+}
+$user_type_found = $user['user_role'];
+
+// Account status is only revealed to someone who knows the password.
+$registerPage = '../bpamis_website/bpamis.php';
+if ($user_type_found === 'resident' && (int)($user['isVerify'] ?? 0) === 0) {
+    bpamis_login_fail('Your account is not verified yet. Please wait for the barangay to verify it.', $isAjax, $registerPage, ['redirect' => $registerPage]);
+}
+if ((int)($user['isActive'] ?? 0) === 0) {
+    bpamis_login_fail('Your account is inactive. Please contact or go to the barangay for reactivation.', $isAjax, $registerPage, ['redirect' => $registerPage]);
 }
 
-// check if is user verify
-if (
-    ($user_type_found === 'resident' && ( (int)($user['isVerify'] ?? 0) === 0 || (int)($user['isActive'] ?? 0) === 0 )) ||
-    ($user_type_found === 'official' && (int)($user['isActive'] ?? 0) === 0) ||
-    ($user_type_found === 'external' && (int)($user['isActive'] ?? 0) === 0)
-) {
-     // Determine specific message for residents: prefer 'not verified' message if not verified, otherwise 'inactive'
-    if ($user_type_found === 'resident') {
-        if ((int)($user['isVerify'] ?? 0) === 0) {
-            $msg = 'Your account is not Verify yet. Please wait for it to be verify';
-        } elseif ((int)($user['isActive'] ?? 0) === 0) {
-            $msg = 'Your account is inactive. Please contact or go to barangay for reactivation';
-        } else {
-            // fallback
-            $msg = 'Your account is inactive. Please contact or go to barangay for reactivation';
-        }
-    } else {
-        $msg = 'Your account is inactive. Please contact or go to barangay for reactivation';
-    }
+bpamis_rate_clear($conn, 'login', $rateIdentity);
 
-    $registerPage = '../bpamis_website/bpamis.php';
-
-    if ($isAjax) {
-        header('Content-Type: application/json');
-        echo json_encode([
-            'success' => false,
-            'redirect' => $registerPage,
-            'message' => $msg
-        ]);
-        exit;
-    }
-
-    // Normal (non-AJAX) redirect
-    echo "<script>alert('{$msg}'); window.location.href='{$registerPage}';</script>";
-    exit;
-}
-
-// Check password (note: $user['password'] should contain the hashed password)
-if (!isset($user['password']) || !password_verify($password, $user['password'])) {
-    if ($isAjax) {
-        header('Content-Type: application/json');
-        echo json_encode(['success' => false, 'message' => 'Invalid email or password.']);
-        exit;
-    }
-    echo "<script>alert('Invalid email or password.'); window.location.href='{$loginPage}';</script>";
-    exit;
-}
-
-// Prepare redirect (and target session namespace)
-$redirect = $loginPage; // fallback
-$_target_ns = 'BPAMIS_APP';
-
+// Role landing pages
+$redirect = $loginPage;
 switch ($user_type_found) {
     case 'resident':
-        $redirect = "../ResidentMenu/home-resident.php";
-        $_target_ns = 'BPAMIS_RESIDENT';
+        $redirect = '../ResidentMenu/home-resident.php';
         break;
-
     case 'external':
-        $redirect = "../ExternalMenu/home-external.php";
-        $_target_ns = 'BPAMIS_EXTERNAL';
+        $redirect = '../ExternalMenu/home-external.php';
         break;
-
     case 'official':
         $roleText = strtolower($user['Position'] ?? '');
-        if (stripos($roleText, 'barangay secretary') !== false) {
-            $redirect = "../SecMenu/home-secretary.php";
-            $_target_ns = 'BPAMIS_SEC';
-        } elseif (stripos($roleText, 'lupon-hepe') !== false || stripos($roleText, 'lupon head') !== false) {
-            $redirect = "../LuponHeadMenu/home-luponhead.php";
-            $_target_ns = 'BPAMIS_LUPONHEAD';
-        } elseif (stripos($roleText, 'lupon tagapamayapa') !== false) {
-            $redirect = "../OfficialMenu/home-lupon.php";
-            $_target_ns = 'BPAMIS_OFFICIAL';
-        } elseif (stripos($roleText, 'barangay captain') !== false) {
-            $redirect = "../OfficialMenu/home-captain.php";
-            $_target_ns = 'BPAMIS_OFFICIAL';
+        if (strpos($roleText, 'lupon-hepe') !== false || strpos($roleText, 'lupon head') !== false) {
+            $redirect = '../LuponHeadMenu/home-luponhead.php';
+        } elseif (strpos($roleText, 'lupon tagapamayapa') !== false) {
+            $redirect = '../OfficialMenu/home-lupon.php';
+        } elseif (strpos($roleText, 'barangay captain') !== false) {
+            $redirect = '../OfficialMenu/home-captain.php';
         } else {
-            $redirect = "../SecMenu/home-secretary.php";
-            $_target_ns = 'BPAMIS_SEC';
+            $redirect = '../SecMenu/home-secretary.php';
         }
         break;
-
-    default:
-        $redirect = $loginPage;
 }
 
-// Migrate to role-specific session namespace and set session data
-// Close any previously opened default session to allow changing the name
-if (session_status() === PHP_SESSION_ACTIVE) session_write_close();
-if (!headers_sent()) { session_name($_target_ns); }
-session_start();
-
-// Common session data
+// A new session id on login prevents session fixation.
+session_regenerate_id(true);
+$_SESSION = [];
 $_SESSION['user'] = $user['email'];
 $_SESSION['username'] = $user['username'] ?? '';
 $_SESSION['user_id'] = $user['id'] ?? '';
 $_SESSION['role'] = $user_type_found;
-
-// Role-specific
 if ($user_type_found === 'official') {
     $_SESSION['official_id'] = $user['id'] ?? '';
     $_SESSION['official_name'] = $user['Name'] ?? '';
     $_SESSION['official_position'] = $user['Position'] ?? '';
 }
 
-// Ajax vs normal redirect
 if ($isAjax) {
     header('Content-Type: application/json');
     echo json_encode(['success' => true, 'redirect' => $redirect]);
     exit;
 }
-
-header("Location: $redirect");
+header('Location: ' . $redirect);
 exit;
-?>

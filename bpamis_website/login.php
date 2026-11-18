@@ -1,5 +1,5 @@
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
 
-<?php
 // Try to detect existing role-specific sessions (created by logindb.php using session_name)
 // If the user is already logged in under any role, show a message and redirect to their dashboard.
 if (session_status() === PHP_SESSION_NONE) {
@@ -10,12 +10,12 @@ if (session_status() === PHP_SESSION_NONE) {
         if (!empty($_COOKIE[$sname])) {
             if (session_status() === PHP_SESSION_ACTIVE) { session_write_close(); }
             session_name($sname);
-            @session_start();
+            if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
             $isLogged = (!empty($_SESSION['user_id']) || !empty($_SESSION['official_id']) || !empty($_SESSION['user']));
             if ($isLogged) {
                 $role = strtolower($_SESSION['role'] ?? '');
-                $redirect = '/BPAMIS/bpamis_website/bpamis.php';
+                $redirect = (BPAMIS_BASE . '/bpamis_website/bpamis.php');
                 if ($role === 'resident') $redirect = '../ResidentMenu/home-resident.php';
                 elseif ($role === 'external') $redirect = '../ExternalMenu/home-external.php';
                 elseif ($role === 'official') {
@@ -43,7 +43,7 @@ if (session_status() === PHP_SESSION_NONE) {
         }
     }
     // No active role sessions — start a fresh default public session.
-    @session_start();
+    if (session_status() === PHP_SESSION_NONE) { session_start(); }
 }
 ?>
 <!DOCTYPE html>
@@ -60,7 +60,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="styles/premium-animations.css">
     <link rel="stylesheet" href="styles/premium-patterns.css">
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
     <style>
         body {
             background: #e8f0fe;
@@ -662,6 +662,7 @@ if (session_status() === PHP_SESSION_NONE) {
                                 <a href="register.php" class="text-blue-600 hover:text-blue-700">Register here</a>
                             </p>
                         </form>
+<?php include __DIR__ . '/includes/demo_logins.php'; ?>
 
                         <div id="loginMessageMobile" class="hidden mt-4 text-center"></div>
                     </div>
@@ -711,6 +712,7 @@ if (session_status() === PHP_SESSION_NONE) {
                             <a href="register.php" class="text-blue-600 hover:text-blue-700">Register here</a>
                         </p>
                     </form>
+<?php include __DIR__ . '/includes/demo_logins.php'; ?>
 
                     <br>
                     <div id="loginMessage" class="hidden mt-4 text-center"></div>

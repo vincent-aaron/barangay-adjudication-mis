@@ -1,5 +1,6 @@
-<?php
-session_start();
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 require_once(__DIR__ . '/../server/server.php');
 
 // Prefer Composer only if PHP >= 8.1 to avoid vendor platform_check fatal
@@ -178,7 +179,7 @@ try {
         exit;
     }
 } catch (Throwable $e) {
-    echo json_encode(['success' => false, 'message' => 'Failed to read file: ' . $e->getMessage()]);
+    echo json_encode(['success' => false, 'message' => 'Failed to read file: ']);
     exit;
 }
 

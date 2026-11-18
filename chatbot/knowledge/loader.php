@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../../includes/bootstrap.php';
+
 /**
  * Lightweight knowledge loader & retriever for chatbot.
  * - Loads JSON topics

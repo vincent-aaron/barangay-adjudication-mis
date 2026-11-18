@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/bootstrap.php';
+
 include '../server/server.php'; // Ensure connection is available
 
 $notif_count = 0;
@@ -123,7 +124,7 @@ if ($resultNotif && $row = $resultNotif->fetch_assoc()) {
             var link = document.querySelector("link[rel*='icon']") || document.createElement('link');
             link.type = 'image/png';
             link.rel = 'icon';
-            // From SecMenu pages, this relative path resolves to /BPAMIS/SecMenu/logo.png
+            // From SecMenu pages, this relative path resolves to <?= BPAMIS_BASE ?>/SecMenu/logo.png
             link.href = '../SecMenu/logo.png';
             document.head.appendChild(link);
         } catch(e) { /* no-op */ }

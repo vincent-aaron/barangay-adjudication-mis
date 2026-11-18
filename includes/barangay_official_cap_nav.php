@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/bootstrap.php';
+
 include '../server/server.php'; // Ensure connection is available
 
 $notif_count = 0;

@@ -1,9 +1,13 @@
-<?php 
+<?php require_once __DIR__ . '/../../includes/bootstrap.php';
+$__refererHost = parse_url((string)($_SERVER['HTTP_REFERER'] ?? ''), PHP_URL_HOST);
+if (!$__refererHost || strcasecmp((string)$__refererHost, (string)parse_url('//' . ($_SERVER['HTTP_HOST'] ?? ''), PHP_URL_HOST)) !== 0) {
+    bpamis_deny(403, 'This action must be started from within BPAMIS.');
+}
+
 require_once('db-connect.php');
 
 if(!isset($_GET['id'])){
     echo "<script> alert('Undefined Schedule ID.'); window.location.href = 'CalendarSec.php'; </script>";
-    $conn->close();
     exit;
 }
 
@@ -51,11 +55,10 @@ if (!$sched) {
     } else {
         echo "<pre>";
         echo "An Error occurred.<br>";
-        echo "Error: " . $conn->error . "<br>";
+        echo "Request failed" . "<br>";
         echo "</pre>";
     }
     $stmt->close();
-    $conn->close();
     exit;
 }
 
@@ -184,7 +187,6 @@ if ($caseInfo) {
 $msg = 'Event has been cancelled and hidden from participant calendars.';
 echo "<script> alert('" . addslashes($msg) . "'); window.location.href = '" . addslashes($returnTarget) . "'; </script>";
 
-$conn->close();
 
 
 ?>

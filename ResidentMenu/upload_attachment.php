@@ -1,5 +1,6 @@
-<?php
-session_start();
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 include '../server/server.php';
 
 if(!isset($_SESSION['user_id'])){ header("Location: ../login.php"); exit; }
@@ -19,12 +20,12 @@ $complaint = $res->fetch_assoc();
 $stmt->close();
 
 $uploadDir = "../uploads/complaints/";
-if(!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+if(!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
 
 $allowedExt = ['jpg','jpeg','png','gif','webp','bmp','pdf'];
 $newPaths = [];
 
-foreach($_FILES['attachments']['tmp_name'] as $i=>$tmpName){
+foreach(($_FILES['attachments']['tmp_name'] ?? []) as $i=>$tmpName){
     if(!is_uploaded_file($tmpName)) continue;
     $name = basename($_FILES['attachments']['name'][$i]);
     $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
@@ -33,7 +34,7 @@ foreach($_FILES['attachments']['tmp_name'] as $i=>$tmpName){
     $newName = uniqid("att_").".".$ext;
     $dest = $uploadDir.$newName;
 
-    if(move_uploaded_file($tmpName, $dest)){
+    if(bpamis_safe_move($tmpName, $dest)){
         $newPaths[] = "uploads/complaints/".$newName;
     }
 }

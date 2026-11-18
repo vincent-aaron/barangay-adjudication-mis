@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../../includes/bootstrap.php';
+
 // FAQs Modal Include File
 // This file contains the FAQs modal that can be included in any page
 if (!defined('FAQS_MODAL_INCLUDED')) {

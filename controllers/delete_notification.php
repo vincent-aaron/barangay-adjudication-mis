@@ -1,11 +1,12 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 header('Content-Type: application/json');
 ini_set('display_errors', 0);
 error_reporting(0);
 
 // Start session if needed
 if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+    if (session_status() === PHP_SESSION_NONE) { session_start(); }
 }
 
 try {
@@ -55,6 +56,15 @@ try {
         echo json_encode(['success' => false, 'error' => 'Notification not found']);
         exit;
     }
+
+    // Residents and external users can only remove their own notifications.
+    $sessionRole = bpamis_current_role();
+    $sessionUser = (int)($_SESSION['user_id'] ?? 0);
+    if (($sessionRole === 'resident' && (int)($notification['resident_id'] ?? 0) !== $sessionUser)
+        || ($sessionRole === 'external' && (int)($notification['external_complaint_id'] ?? 0) !== $sessionUser)) {
+        echo json_encode(['success' => false, 'error' => 'Notification not found']);
+        exit;
+    }
     
     // Insert into notifications_trash using only the basic required fields
     $stmt = $conn->prepare("INSERT INTO notifications_trash (notification_id, type, title, message, created_at, is_read, trashed_at, trashed_by) VALUES (?, ?, ?, ?, ?, ?, NOW(), ?)");
@@ -78,7 +88,7 @@ try {
     } else {
         echo json_encode([
             'success' => false, 
-            'error' => 'Failed to move to trash: ' . $stmt->error,
+            'error' => 'Failed to move to trash',
             'found_with' => $foundWith
         ]);
     }
@@ -86,6 +96,6 @@ try {
     $stmt->close();
     
 } catch (Exception $e) {
-    echo json_encode(['success' => false, 'error' => 'Server error: ' . $e->getMessage()]);
+    echo json_encode(['success' => false, 'error' => 'Server error: ']);
 }
 ?>

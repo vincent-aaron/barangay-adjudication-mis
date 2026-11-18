@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 include '../server/server.php';
 
 $status = $_POST['status'] ?? 'all';

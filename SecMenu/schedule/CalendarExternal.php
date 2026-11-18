@@ -1,5 +1,6 @@
-<?php
-session_start();
+<?php require_once __DIR__ . '/../../includes/bootstrap.php';
+
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 require_once('db-connect.php');
 include('../../server/server.php'); 
 
@@ -18,7 +19,7 @@ if (!$External_Complainant_ID) {
 }
 
 // Verify that the external complainant exists (optional, but good for security)
-$val = $conn->prepare("SELECT 1 FROM bpamis_demo.external_complainant WHERE External_Complaint_ID = ?");
+$val = $conn->prepare("SELECT 1 FROM external_complainant WHERE External_Complaint_ID = ?");
 $val->bind_param("i", $External_Complainant_ID);
 $val->execute();
 $val_result = bpamis_stmt_get_result($val);
@@ -32,9 +33,9 @@ $events = [];
 // Get hearings linked to cases where complaint_info.External_Complainant_ID = ?
 $hearing_stmt = $conn->prepare("
   SELECT sl.hearingID, sl.hearingTitle, sl.hearingDateTime, sl.remarks, ci.Case_ID
-    FROM bpamis_demo.schedule_list sl
-    JOIN bpamis_demo.case_info ci ON sl.Case_ID = ci.Case_ID
-    JOIN bpamis_demo.complaint_info co ON ci.Complaint_ID = co.Complaint_ID
+    FROM schedule_list sl
+    JOIN case_info ci ON sl.Case_ID = ci.Case_ID
+    JOIN complaint_info co ON ci.Complaint_ID = co.Complaint_ID
     WHERE co.External_Complainant_ID = ?
     AND sl.visible = 1
 ");
@@ -55,7 +56,6 @@ while ($r = $hearing_res->fetch_assoc()) {
 }
 $hearing_stmt->close();
 
-$conn->close();
 
 $events_json = json_encode($events);
 ?>

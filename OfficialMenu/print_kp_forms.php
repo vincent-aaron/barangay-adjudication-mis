@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 /**
  * Print KP Forms Page
  * Barangay Panducot Adjudication Management Information System
@@ -38,10 +39,10 @@ switch ($form_id) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $formTitle ?> - Barangay Panducot</title>
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
-    <?php include '../includes/case_assistant_styles.php'; ?>
+    
     <?php include 'sidebar_.php';?>
     <style>
         @media print {
@@ -239,6 +240,6 @@ switch ($form_id) {
         <?php endif; ?>
     </div>    <?php endif; ?>
     
-    <?php include '../includes/case_assistant.php'; ?>
+    <?php include '../chatbot/bpamis_case_assistant.php'; ?>
 </body>
 </html>

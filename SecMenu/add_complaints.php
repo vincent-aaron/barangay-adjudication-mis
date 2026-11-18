@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
+
 include '../controllers/session_control.php';
 include_once __DIR__ . '/../server/server.php';
 $success_message = '';
@@ -136,14 +137,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $attachment_paths = [];
     if (!empty($_FILES['attachments']['name']) && is_array($_FILES['attachments']['name'])) {
         $uploadDir = __DIR__ . '/../uploads/';
-        if (!is_dir($uploadDir)) { @mkdir($uploadDir, 0777, true); }
+        if (!is_dir($uploadDir)) { @mkdir($uploadDir, 0755, true); }
         foreach ($_FILES['attachments']['name'] as $i => $nm) {
             if ($_FILES['attachments']['error'][$i] !== UPLOAD_ERR_OK) continue;
             $size = (int)$_FILES['attachments']['size'][$i];
             // Size limit ~20MB per file
             if ($size > 20*1024*1024) continue;
             $safeName = time().'_'.preg_replace('/[^A-Za-z0-9_.-]/','_', $nm);
-            if (move_uploaded_file($_FILES['attachments']['tmp_name'][$i], $uploadDir.$safeName)) {
+            if (bpamis_safe_move($_FILES['attachments']['tmp_name'][$i], $uploadDir.$safeName)) {
                 $attachment_paths[] = 'uploads/'.$safeName;
             }
         }
@@ -305,7 +306,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8" />
     <title>Add Complaint</title>
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -687,7 +688,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </label>
                 </div>
                 <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-dashed border-primary-200/60">
-                    <a href="home.php" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-white/70 hover:bg-white text-gray-600 border border-gray-300 text-sm font-medium shadow-sm transition"><i class="fa fa-xmark"></i> Cancel</a>
+                    <a href="home-secretary.php" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-white/70 hover:bg-white text-gray-600 border border-gray-300 text-sm font-medium shadow-sm transition"><i class="fa fa-xmark"></i> Cancel</a>
                     <button type="submit" class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold shadow focus:outline-none focus:ring-4 focus:ring-primary-300/50 transition">
                         <i class="fa fa-paper-plane"></i> Submit Complaint
                     </button>

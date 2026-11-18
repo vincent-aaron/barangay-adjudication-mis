@@ -1,5 +1,5 @@
+<?php require_once __DIR__ . '/../../includes/bootstrap.php';
 
-<?php
 require_once __DIR__ . '/../vendor/autoload.php';
 include_once __DIR__ . '/../../server/server.php';
 

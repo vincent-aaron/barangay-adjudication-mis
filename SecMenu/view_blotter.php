@@ -1,5 +1,5 @@
+<?php require_once __DIR__ . '/../includes/bootstrap.php';
 
-<?php
 include '../controllers/session_control.php';
 include_once __DIR__ . '/../server/server.php';
 $blotters = [];
@@ -12,7 +12,7 @@ $result = $conn->query("
 ");
 
 // Also include complaints that were converted as 'Record Purposes' so they appear in this list
-// $rec = $conn->query("SELECT c.Complaint_ID AS Blotter_ID, c.Complaint_Details AS Blotter_Description, c.Resident_ID AS Reported_By, c.Date_Filed AS Date_Reported, r.First_Name, r.Middle_Name, r.Last_Name FROM COMPLAINT_INFO c LEFT JOIN RESIDENT_INFO r ON c.Resident_ID = r.Resident_ID WHERE UPPER(TRIM(c.Status)) = 'RECORD PURPOSES' ORDER BY c.Complaint_ID DESC");
+// $rec = $conn->query("SELECT c.Complaint_ID AS Blotter_ID, c.Complaint_Details AS Blotter_Description, c.Resident_ID AS Reported_By, c.Date_Filed AS Date_Reported, r.First_Name, r.Middle_Name, r.Last_Name FROM complaint_info c LEFT JOIN resident_info r ON c.Resident_ID = r.Resident_ID WHERE UPPER(TRIM(c.Status)) = 'RECORD PURPOSES' ORDER BY c.Complaint_ID DESC");
 // if ($rec && $rec->num_rows > 0) {
 //     while ($r = $rec->fetch_assoc()) {
 //         // Mark source to distinguish complaint-based entries
@@ -30,7 +30,7 @@ while ($row = $result->fetch_assoc()) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Blotter Reports</title>
-    <link rel="icon" type="image/png" href="/BPAMIS/SecMenu/logo.png" />
+    <link rel="icon" type="image/png" href="<?= BPAMIS_BASE ?>/SecMenu/logo.png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

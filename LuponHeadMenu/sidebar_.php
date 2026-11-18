@@ -1,4 +1,4 @@
-
+<?php require_once __DIR__ . '/../includes/bootstrap.php'; ?>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
         tailwind.config = {

@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../../includes/bootstrap.php';
+
 // Help Center Modal Include File
 // This file contains the Help Center modal that can be included in any page
 if (!defined('HELP_CENTER_MODAL_INCLUDED')) {
@@ -585,7 +586,7 @@ if (!defined('HELP_CENTER_MODAL_INCLUDED')) {
                                     <i class="fas fa-envelope text-blue-600 mt-1 mr-3"></i>
                                     <div>
                                         <p class="text-gray-700 font-medium">Email Support</p>
-                                        <p class="text-gray-600">support@bpamis.gov.ph</p>
+                                        <p class="text-gray-600">support@example.com</p>
                                         <p class="text-sm text-gray-500">We aim to respond within 24 hours</p>
                                     </div>
                                 </div>
